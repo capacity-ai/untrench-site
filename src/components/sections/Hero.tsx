@@ -17,7 +17,7 @@ export default function Hero() {
           <div className="col-span-12 lg:col-span-10">
             <div className="reveal d1 mb-6 lg:mb-8 mono text-xs uppercase tracking-[0.2em] flex items-center gap-3 opacity-80">
               <span className="inline-block w-8 h-px bg-current"></span>
-              <span>For local government</span>
+              <span>For local and state government</span>
             </div>
             <h1 className="reveal d2 display text-[14vw] md:text-[10vw] lg:text-[148px] xl:text-[172px] font-semibold">
               Most AI projects<br />

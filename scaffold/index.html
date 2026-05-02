@@ -1,0 +1,1311 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CapaCity &middot; Agentic systems for local government &middot; by Polco</title>
+    <meta
+      name="description"
+      content="CapaCity by Polco. Agentic systems for cities, counties, and the agencies that serve them. Built on 30+ years of civic data, for work that has to be right, not 75%."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=JetBrains+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              display: ['Fraunces', 'serif'],
+              sans: ['"Inter Tight"', 'system-ui', 'sans-serif'],
+              mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      :root {
+        --ink: #15130f;
+        --paper: #f1ece0;
+        --paper-deep: #e7e0cd;
+        --paper-deeper: #d9d0b5;
+        --accent: #b8351a;
+        --accent-soft: #f4d4be;
+        --rule: rgba(21, 19, 15, 0.18);
+      }
+      * { -webkit-font-smoothing: antialiased; }
+      html { scroll-behavior: smooth; }
+      body {
+        background: var(--paper);
+        color: var(--ink);
+        font-family: 'Inter Tight', system-ui, sans-serif;
+        font-feature-settings: 'ss01', 'cv11';
+      }
+      .display {
+        font-family: 'Fraunces', serif;
+        font-variation-settings: 'opsz' 144, 'SOFT' 30;
+        letter-spacing: -0.038em;
+        line-height: 0.92;
+      }
+      .display-italic {
+        font-family: 'Fraunces', serif;
+        font-style: italic;
+        font-variation-settings: 'opsz' 144;
+      }
+      .display-italic-heavy {
+        font-family: 'Fraunces', serif;
+        font-style: italic;
+        font-weight: 700;
+        font-variation-settings: 'opsz' 144;
+        letter-spacing: -0.045em;
+      }
+      .label {
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        font-weight: 500;
+      }
+      .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+      .hairline { border-color: var(--rule); }
+      .num { font-feature-settings: 'tnum' 1; }
+
+      /* Paper grain */
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+        opacity: 0.5;
+        mix-blend-mode: multiply;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.08 0 0 0 0 0.07 0 0 0 0 0.06 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
+      }
+
+      /* Marquee */
+      .marquee { overflow: hidden; }
+      .marquee-track {
+        display: flex;
+        gap: 3rem;
+        width: max-content;
+        animation: marquee 50s linear infinite;
+      }
+      @keyframes marquee {
+        from { transform: translateX(0); }
+        to { transform: translateX(-50%); }
+      }
+
+      /* Reveal on load */
+      .reveal { opacity: 0; transform: translateY(10px); animation: reveal 1s cubic-bezier(0.2, 0.6, 0.2, 1) forwards; }
+      @keyframes reveal { to { opacity: 1; transform: translateY(0); } }
+      .d1 { animation-delay: 0.05s; }
+      .d2 { animation-delay: 0.18s; }
+      .d3 { animation-delay: 0.32s; }
+      .d4 { animation-delay: 0.46s; }
+      .d5 { animation-delay: 0.6s; }
+      .d6 { animation-delay: 0.74s; }
+
+      /* Accent underline */
+      .accent-mark {
+        background: linear-gradient(transparent 65%, var(--accent-soft) 65%, var(--accent-soft) 95%, transparent 95%);
+        padding: 0 0.05em;
+      }
+
+      /* Demo card */
+      .demo-card { transition: transform 0.4s cubic-bezier(0.2, 0.6, 0.2, 1), background 0.4s ease; }
+      .demo-card:hover { transform: translateY(-3px); background: var(--paper-deep); }
+      .demo-card .arrow { transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+      .demo-card:hover .arrow { transform: translate(4px, -4px); }
+      .demo-card:hover .arrow-line { transform: scaleX(1); }
+
+      /* Strikethrough on the "vs the alternative" section */
+      .strike { position: relative; display: inline-block; }
+      .strike::after {
+        content: '';
+        position: absolute;
+        left: -2%;
+        right: -2%;
+        top: 52%;
+        height: 2px;
+        background: var(--accent);
+        transform: rotate(-2deg);
+      }
+
+      /* Buttons */
+      .btn-primary {
+        background: var(--ink);
+        color: var(--paper);
+        border: 1px solid var(--ink);
+        transition: all 0.2s ease;
+      }
+      .btn-primary:hover { background: var(--accent); border-color: var(--accent); }
+      .btn-ghost {
+        background: transparent;
+        color: var(--ink);
+        border: 1px solid var(--ink);
+        transition: all 0.2s ease;
+      }
+      .btn-ghost:hover { background: var(--ink); color: var(--paper); }
+
+      /* Tab/pill */
+      .pill {
+        border: 1px solid var(--ink);
+        border-radius: 999px;
+        padding: 0.35rem 0.85rem;
+      }
+
+      /* Static demo previews */
+      .preview-frame {
+        background: var(--paper-deep);
+        border: 1px solid var(--rule);
+        position: relative;
+      }
+      .preview-dots { display: flex; gap: 6px; }
+      .preview-dot { width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--rule); }
+
+      /* Striped fill */
+      .stripe {
+        background-image: repeating-linear-gradient(135deg, rgba(21,19,15,0.06) 0 6px, transparent 6px 12px);
+      }
+
+      /* Form */
+      .field {
+        background: transparent;
+        border: 0;
+        border-bottom: 1px solid var(--ink);
+        padding: 0.75rem 0;
+        font-family: inherit;
+        font-size: 1.05rem;
+        color: var(--ink);
+        width: 100%;
+        outline: none;
+        transition: border-color 0.2s ease;
+      }
+      .field:focus { border-color: var(--accent); }
+      .field::placeholder { color: rgba(21, 19, 15, 0.4); }
+
+      /* Manifesto numbering */
+      .manifesto-num {
+        font-family: 'Fraunces', serif;
+        font-variation-settings: 'opsz' 144;
+        font-weight: 400;
+        font-style: italic;
+        color: var(--accent);
+      }
+
+      /* Subtle pulsing dot */
+      .pulse-dot {
+        width: 8px; height: 8px; border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 0 0 var(--accent);
+        animation: pulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+      @keyframes pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(184, 53, 26, 0.5); }
+        50% { box-shadow: 0 0 0 10px rgba(184, 53, 26, 0); }
+      }
+
+      /* Plus icon rotation in details */
+      details > summary { list-style: none; cursor: pointer; }
+      details > summary::-webkit-details-marker { display: none; }
+      details .plus { transition: transform 0.25s ease; display: inline-block; }
+      details[open] .plus { transform: rotate(45deg); }
+
+      /* Caret in CTAs */
+      .caret { display: inline-block; transition: transform 0.25s ease; }
+      a:hover .caret, button:hover .caret { transform: translateX(3px); }
+
+      /* Section labels with thin top rule */
+      .section-rule {
+        display: flex; align-items: center; gap: 1rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--ink);
+      }
+
+      /* For the "what we are not" comparison */
+      .compare-col h4 { font-family: 'Fraunces', serif; font-variation-settings: 'opsz' 144; }
+    </style>
+  </head>
+
+  <body class="relative">
+    <!-- ======================== NAV ======================== -->
+    <header class="relative z-10 border-b hairline">
+      <div class="max-w-[1400px] mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
+        <a href="#" class="flex items-center gap-3">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <rect x="1" y="1" width="9" height="9" stroke="currentColor" stroke-width="1.4"/>
+            <rect x="12" y="1" width="9" height="9" stroke="currentColor" stroke-width="1.4"/>
+            <rect x="1" y="12" width="9" height="9" stroke="currentColor" stroke-width="1.4"/>
+            <rect x="12" y="12" width="9" height="9" fill="currentColor"/>
+          </svg>
+          <span class="display text-[22px] font-semibold tracking-tight">Capa<span style="color: var(--accent)">c</span>ity</span>
+          <span class="hidden sm:inline-block mono text-[10px] uppercase tracking-[0.16em] opacity-60 border-l hairline pl-3">by Polco</span>
+        </a>
+        <nav class="hidden md:flex items-center gap-9 text-sm">
+          <a href="#examples" class="hover:text-[color:var(--accent)] transition-colors">Examples</a>
+          <a href="#approach" class="hover:text-[color:var(--accent)] transition-colors">Approach</a>
+          <a href="#manifesto" class="hover:text-[color:var(--accent)] transition-colors">What we believe</a>
+          <a href="#why" class="hover:text-[color:var(--accent)] transition-colors">Why us</a>
+          <a href="#pricing" class="hover:text-[color:var(--accent)] transition-colors">Pricing</a>
+          <a href="#contact" class="hover:text-[color:var(--accent)] transition-colors">Contact</a>
+        </nav>
+        <a href="#contact" class="btn-primary text-sm px-4 py-2">
+          Talk to us <span class="caret">→</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- ======================== HERO ======================== -->
+    <section class="relative z-10 border-b hairline">
+      <div class="max-w-[1400px] mx-auto px-6 lg:px-10 pt-20 pb-24 lg:pt-28 lg:pb-32">
+        <div class="grid grid-cols-12 gap-6 lg:gap-10">
+          <!-- Left rail -->
+          <div class="col-span-12 lg:col-span-2">
+            <div class="reveal d1 label flex items-center gap-2">
+              <span class="pulse-dot"></span>
+              <span>No. 001 — 2026</span>
+            </div>
+          </div>
+
+          <!-- Headline -->
+          <div class="col-span-12 lg:col-span-10">
+            <div class="reveal d1 mb-6 lg:mb-8 mono text-xs uppercase tracking-[0.2em] flex items-center gap-3 opacity-80">
+              <span class="inline-block w-8 h-px bg-current"></span>
+              <span>For local and state government</span>
+            </div>
+            <h1 class="reveal d2 display text-[14vw] md:text-[10vw] lg:text-[148px] xl:text-[172px] font-semibold">
+              Most AI projects<br/>
+              <span class="display-italic-heavy">don&rsquo;t work.</span>
+            </h1>
+            <h2 class="reveal d3 display text-[7vw] md:text-[5vw] lg:text-[64px] xl:text-[72px] mt-6 lg:mt-10 max-w-[18ch] font-medium">
+              Ours do, because we do<br/>the <span class="accent-mark">unglamorous parts</span>.
+            </h2>
+          </div>
+        </div>
+
+        <!-- Sub-grid: lede + CTAs + meta -->
+        <div class="grid grid-cols-12 gap-6 lg:gap-10 mt-16 lg:mt-24">
+          <div class="col-span-12 lg:col-span-2">
+            <div class="reveal d4 label">The pitch</div>
+          </div>
+          <div class="col-span-12 lg:col-span-7">
+            <p class="reveal d4 text-xl lg:text-2xl leading-snug max-w-[46ch]">
+              <span class="display-italic">CapaCity</span> builds agentic systems for cities, counties, and the agencies that serve them.
+              We focus on the work where being wrong is <em class="display-italic">expensive.</em>
+              Permits. Grants. RFPs. Code. Constituent mail.
+              If a chatbot can handle it, use a chatbot. If it has to be right, that&rsquo;s us.
+            </p>
+            <div class="reveal d5 mt-10 flex flex-wrap gap-3">
+              <a href="#examples" class="btn-primary px-5 py-3 text-sm">
+                Try a live demo <span class="caret">&rarr;</span>
+              </a>
+              <a href="#contact" class="btn-ghost px-5 py-3 text-sm">
+                Tell us your problem
+              </a>
+            </div>
+          </div>
+          <div class="col-span-12 lg:col-span-3 lg:border-l hairline lg:pl-8">
+            <div class="reveal d5 label mb-4">Built by</div>
+            <p class="reveal d5 text-[15px] leading-snug mb-6">
+              <span class="display-italic">Polco.</span> Three decades and ~1,000 cities of civic data and trust.
+              We know what good looks like in local government, and what gets sold to it that <em>isn&rsquo;t</em>.
+            </p>
+            <div class="reveal d5 label mb-3 opacity-70">Built for</div>
+            <ul class="reveal d5 mono text-[13px] space-y-1.5 leading-relaxed">
+              <li>City &amp; county staff</li>
+              <li>Planning &amp; permitting</li>
+              <li>Grants &amp; budget offices</li>
+              <li>Procurement &amp; legal</li>
+              <li>Council &amp; constituent services</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Marquee -->
+      <div class="marquee border-t hairline py-5 bg-[color:var(--paper-deep)]">
+        <div class="marquee-track">
+          <div class="flex items-center gap-12 mono text-sm whitespace-nowrap pr-12">
+            <span>More capacity for the work that matters</span>
+            <span>&loz;</span>
+            <span>Built for cities, counties, and special districts</span>
+            <span>&loz;</span>
+            <span>Your codes, not the internet&rsquo;s average</span>
+            <span>&loz;</span>
+            <span>99.5% beats 75%, especially under public records law</span>
+            <span>&loz;</span>
+            <span>~1,000 cities served, 50 states, 30+ years</span>
+            <span>&loz;</span>
+            <span>If a chatbot solves it, use a chatbot</span>
+            <span>&loz;</span>
+          </div>
+          <div class="flex items-center gap-12 mono text-sm whitespace-nowrap pr-12" aria-hidden="true">
+            <span>More capacity for the work that matters</span>
+            <span>&loz;</span>
+            <span>Built for cities, counties, and special districts</span>
+            <span>&loz;</span>
+            <span>Your codes, not the internet&rsquo;s average</span>
+            <span>&loz;</span>
+            <span>99.5% beats 75%, especially under public records law</span>
+            <span>&loz;</span>
+            <span>~1,000 cities served, 50 states, 30+ years</span>
+            <span>&loz;</span>
+            <span>If a chatbot solves it, use a chatbot</span>
+            <span>&loz;</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================== THE THESIS / VS ======================== -->
+    <section id="approach" class="relative z-10 border-b hairline">
+      <div class="max-w-[1400px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
+        <div class="grid grid-cols-12 gap-6 lg:gap-10">
+          <div class="col-span-12 lg:col-span-2">
+            <div class="section-rule label">&sect; 01 / Approach</div>
+          </div>
+          <div class="col-span-12 lg:col-span-10">
+            <h3 class="display text-[8vw] md:text-[5vw] lg:text-[68px] font-medium max-w-[18ch]">
+              There are two kinds of AI work.<br/>
+              <span class="display-italic">We do one of them.</span>
+            </h3>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-12 gap-6 lg:gap-10 mt-16 lg:mt-20">
+          <div class="col-span-12 lg:col-span-2"></div>
+
+          <!-- Column: ChatGPT -->
+          <div class="col-span-12 md:col-span-6 lg:col-span-5 compare-col">
+            <div class="label mb-4 opacity-60">Option A &middot; free, fast, fine</div>
+            <h4 class="text-3xl lg:text-4xl mb-6 font-medium">
+              You paste it<br/>into a chatbot.
+            </h4>
+            <ul class="space-y-4 text-[17px] leading-relaxed max-w-[40ch]">
+              <li class="flex gap-3">
+                <span class="mono text-[color:var(--accent)] mt-1">+</span>
+                <span>Works most of the time. Free or close to it.</span>
+              </li>
+              <li class="flex gap-3">
+                <span class="mono text-[color:var(--accent)] mt-1">+</span>
+                <span>Great for drafts, summaries, and low-stakes lookups.</span>
+              </li>
+              <li class="flex gap-3">
+                <span class="mono opacity-40 mt-1">&minus;</span>
+                <span class="opacity-70">Hallucinates code citations under public records request.</span>
+              </li>
+              <li class="flex gap-3">
+                <span class="mono opacity-40 mt-1">&minus;</span>
+                <span class="opacity-70">Doesn&rsquo;t know your municipal code, your funders, your forms, your council.</span>
+              </li>
+              <li class="flex gap-3">
+                <span class="mono opacity-40 mt-1">&minus;</span>
+                <span class="opacity-70">No audit trail. No integrations. No one to call when it&rsquo;s wrong.</span>
+              </li>
+            </ul>
+            <div class="mono text-sm mt-8 opacity-60">
+              <span class="strike">Use this for the council packet.</span>
+            </div>
+          </div>
+
+          <!-- Column: CapaCity -->
+          <div class="col-span-12 md:col-span-6 lg:col-span-5 compare-col bg-[color:var(--paper-deep)] p-8 lg:p-10 -mx-2 lg:-mx-0">
+            <div class="label mb-4 text-[color:var(--accent)]">Option B &middot; what we do</div>
+            <h4 class="text-3xl lg:text-4xl mb-6 font-medium">
+              You hire the team that already<br/>knows local government.
+            </h4>
+            <ul class="space-y-4 text-[17px] leading-relaxed max-w-[40ch]">
+              <li class="flex gap-3">
+                <span class="mono text-[color:var(--accent)] mt-1">&rarr;</span>
+                <span>Right answers, with citations to <em>your</em> code, <em>your</em> minutes, <em>your</em> ordinances.</span>
+              </li>
+              <li class="flex gap-3">
+                <span class="mono text-[color:var(--accent)] mt-1">&rarr;</span>
+                <span>Tailored to your jurisdiction, your funders, your prior decisions, your voice.</span>
+              </li>
+              <li class="flex gap-3">
+                <span class="mono text-[color:var(--accent)] mt-1">&rarr;</span>
+                <span>Real interfaces, not a chat box. Defensible records. Reviewable diffs.</span>
+              </li>
+              <li class="flex gap-3">
+                <span class="mono text-[color:var(--accent)] mt-1">&rarr;</span>
+                <span>Evals, guardrails, and a human in the loop wherever the law requires one.</span>
+              </li>
+              <li class="flex gap-3">
+                <span class="mono text-[color:var(--accent)] mt-1">&rarr;</span>
+                <span>Built to be 99.5% right. And to tell you, plainly, when it isn&rsquo;t.</span>
+              </li>
+            </ul>
+            <div class="mono text-sm mt-8">
+              For the work that ends up in the public record.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================== WHY US ======================== -->
+    <section id="why" class="relative z-10 border-b hairline">
+      <div class="max-w-[1400px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
+        <div class="grid grid-cols-12 gap-6 lg:gap-10">
+          <div class="col-span-12 lg:col-span-2">
+            <div class="section-rule label">&sect; 02 / Why us</div>
+          </div>
+          <div class="col-span-12 lg:col-span-10">
+            <h3 class="display text-[8vw] md:text-[5vw] lg:text-[68px] font-medium max-w-[20ch]">
+              We knew we<br/>
+              <span class="display-italic">had to build this.</span>
+            </h3>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-12 gap-6 lg:gap-10 mt-14 lg:mt-20">
+          <div class="col-span-12 lg:col-span-2"></div>
+          <div class="col-span-12 lg:col-span-7 space-y-6 text-lg leading-snug max-w-[58ch]">
+            <p>
+              We&rsquo;re Polco. For 30 years we&rsquo;ve helped nearly 1,000 cities, in every state, understand
+              what their residents actually think and make better decisions with real data.
+              That&rsquo;s our day job, and we&rsquo;re good at it.
+            </p>
+            <p>
+              We didn&rsquo;t set out to build agentic AI products. We started <span class="display-italic">Capacity</span>
+              because we kept watching the same thing happen: vendors selling local governments expensive, brittle
+              &ldquo;AI solutions&rdquo; that hallucinate code citations, ignore the actual jurisdiction,
+              and produce work nobody on staff would sign their name to.
+              Cities deserve better than that. We knew we were the right people to build it.
+            </p>
+            <p>
+              The name is the promise. Cities don&rsquo;t have a time problem. They have a <em class="display-italic">capacity</em> problem.
+              Too few staff, too much work, no room to do anything new. We give that capacity back, built on
+              <em>your</em> codes, your prior decisions, your funders, your voice, and the institutional knowledge
+              we&rsquo;ve earned across a thousand civic relationships.
+            </p>
+          </div>
+          <div class="col-span-12 lg:col-span-3 lg:border-l hairline lg:pl-8">
+            <div class="label mb-4 opacity-70">Polco, in numbers</div>
+            <ul class="space-y-5">
+              <li>
+                <div class="display text-4xl font-medium num">30+</div>
+                <div class="mono text-xs opacity-60 mt-1">years of civic data</div>
+              </li>
+              <li>
+                <div class="display text-4xl font-medium num">~1,000</div>
+                <div class="mono text-xs opacity-60 mt-1">cities served</div>
+              </li>
+              <li>
+                <div class="display text-4xl font-medium num">50</div>
+                <div class="mono text-xs opacity-60 mt-1">states represented</div>
+              </li>
+              <li>
+                <div class="display text-4xl font-medium num">1</div>
+                <div class="mono text-xs opacity-60 mt-1">reason we built this</div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================== EXAMPLES ======================== -->
+    <section id="examples" class="relative z-10 border-b hairline bg-[color:var(--paper-deep)]">
+      <div class="max-w-[1400px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
+        <div class="grid grid-cols-12 gap-6 lg:gap-10">
+          <div class="col-span-12 lg:col-span-2">
+            <div class="section-rule label">&sect; 03 / Examples</div>
+          </div>
+          <div class="col-span-12 lg:col-span-10">
+            <h3 class="display text-[8vw] md:text-[5vw] lg:text-[68px] font-medium max-w-[20ch]">
+              Five things we&rsquo;ve built<br/>
+              <span class="display-italic">for cities like yours.</span>
+            </h3>
+            <p class="mt-6 max-w-[62ch] text-lg leading-snug opacity-80">
+              Each one is a real working agent in a real local-government workflow.
+              They aren&rsquo;t videos and they aren&rsquo;t mockups. You&rsquo;ll be poking at the actual system,
+              with the actual reasoning, on real example data. Permit review is live now. The rest are in active builds.
+            </p>
+          </div>
+        </div>
+
+        <!-- Demo grid -->
+        <div class="mt-16 lg:mt-20 border-t border-[color:var(--ink)]">
+          <!-- Row 1 -->
+          <a href="permit-review-demo.html" class="demo-card grid grid-cols-12 gap-6 lg:gap-10 py-10 lg:py-14 border-b border-[color:var(--ink)] cursor-pointer no-underline text-inherit">
+            <div class="col-span-12 lg:col-span-1">
+              <div class="mono text-[color:var(--accent)] text-lg">01</div>
+              <div class="mt-2 inline-flex items-center gap-1.5 mono text-[10px] uppercase tracking-[0.16em] text-[color:var(--accent)]">
+                <span class="pulse-dot"></span> Live
+              </div>
+            </div>
+            <div class="col-span-12 lg:col-span-5">
+              <div class="label mb-3">Critique &middot; permitting</div>
+              <h4 class="display text-4xl lg:text-5xl font-medium mb-3">Permit review</h4>
+              <p class="text-[17px] leading-snug max-w-[42ch] opacity-80">
+                Reads a permit submission against the actual code in force in your jurisdiction.
+                Flags conflicts with citations to your municipal code. Drafts the reviewer&rsquo;s letter.
+              </p>
+              <div class="mt-6 flex items-center gap-2 text-sm font-medium">
+                <span>Try the demo</span>
+                <span class="arrow inline-block">&UpperRightArrow;</span>
+              </div>
+            </div>
+            <div class="col-span-12 lg:col-span-6">
+              <!-- Static preview: a "review document" -->
+              <div class="preview-frame p-5 lg:p-6">
+                <div class="flex items-center justify-between mb-4">
+                  <div class="preview-dots">
+                    <span class="preview-dot"></span><span class="preview-dot"></span><span class="preview-dot"></span>
+                  </div>
+                  <div class="mono text-[10px] opacity-60">PERMIT-2026-0114 · ADU · Berkeley, CA</div>
+                </div>
+                <div class="space-y-3">
+                  <div class="border-l-2 border-[color:var(--accent)] pl-3">
+                    <div class="mono text-[10px] uppercase tracking-wider opacity-60">Issue · setback</div>
+                    <div class="text-sm">Rear setback shown at <span class="num">3'-6"</span>. <span class="opacity-60">BMC §23.304.060.A requires <span class="num">4'-0"</span> minimum for ADUs over 800 sq ft.</span></div>
+                  </div>
+                  <div class="border-l-2 border-[color:var(--accent)] pl-3">
+                    <div class="mono text-[10px] uppercase tracking-wider opacity-60">Issue · egress</div>
+                    <div class="text-sm">Bedroom 2 window sill at <span class="num">46"</span>. <span class="opacity-60">CRC R310.2.2 requires ≤44" from finished floor.</span></div>
+                  </div>
+                  <div class="border-l-2 border-[color:var(--ink)] opacity-50 pl-3">
+                    <div class="mono text-[10px] uppercase tracking-wider">Note</div>
+                    <div class="text-sm">Solar-ready provisions appear satisfied per CALGreen §4.201.1.</div>
+                  </div>
+                </div>
+                <div class="mt-4 stripe h-2 rounded-sm"></div>
+              </div>
+            </div>
+          </a>
+
+          <!-- Row 2 -->
+          <article class="demo-card grid grid-cols-12 gap-6 lg:gap-10 py-10 lg:py-14 border-b border-[color:var(--ink)] cursor-default opacity-95">
+            <div class="col-span-12 lg:col-span-1">
+              <div class="mono text-[color:var(--accent)] text-lg">02</div>
+              <div class="mt-2 inline-flex items-center gap-1.5 mono text-[10px] uppercase tracking-[0.16em] opacity-60">
+                In build
+              </div>
+            </div>
+            <div class="col-span-12 lg:col-span-5">
+              <div class="label mb-3">Search + draft &middot; grants</div>
+              <h4 class="display text-4xl lg:text-5xl font-medium mb-3">Grant finder &amp; writer</h4>
+              <p class="text-[17px] leading-snug max-w-[42ch] opacity-80">
+                Reads your city&rsquo;s capital plan and prior awards. Surfaces federal, state, and foundation grants you actually qualify for, with fit reasoning, then drafts the narrative in your voice, not in AI voice.
+              </p>
+              <div class="mt-6 flex items-center gap-2 text-sm font-medium opacity-70">
+                <span>Coming soon</span>
+              </div>
+            </div>
+            <div class="col-span-12 lg:col-span-6">
+              <div class="preview-frame p-5 lg:p-6">
+                <div class="flex items-center justify-between mb-4">
+                  <div class="preview-dots">
+                    <span class="preview-dot"></span><span class="preview-dot"></span><span class="preview-dot"></span>
+                  </div>
+                  <div class="mono text-[10px] opacity-60">CITY &middot; pop. 38,400 &middot; capital plan FY26</div>
+                </div>
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between text-sm py-1.5 border-b hairline">
+                    <span>USDOT Safe Streets &amp; Roads for All</span>
+                    <span class="mono text-[color:var(--accent)]">fit &middot; 0.94</span>
+                  </div>
+                  <div class="flex items-center justify-between text-sm py-1.5 border-b hairline">
+                    <span>EPA Community Change Grants</span>
+                    <span class="mono text-[color:var(--accent)]">fit &middot; 0.88</span>
+                  </div>
+                  <div class="flex items-center justify-between text-sm py-1.5 border-b hairline">
+                    <span>FEMA BRIC pre-disaster mitigation</span>
+                    <span class="mono text-[color:var(--accent)]">fit &middot; 0.81</span>
+                  </div>
+                  <div class="flex items-center justify-between text-sm py-1.5 opacity-50">
+                    <span>HUD CDBG rural set-aside</span>
+                    <span class="mono">fit &middot; 0.42 (pop. cap)</span>
+                  </div>
+                </div>
+                <div class="mt-4 p-3 bg-[color:var(--paper)] border hairline">
+                  <div class="mono text-[10px] uppercase tracking-wider opacity-60 mb-1">Draft &middot; project narrative &sect;2</div>
+                  <div class="text-sm leading-snug italic">&ldquo;The Maple Street corridor, identified in our 2024 Local Road Safety Plan as the city&rsquo;s highest-injury arterial, aligns directly with USDOT&rsquo;s 2026 SS4A priority on systemic redesign in communities under 50,000&hellip;&rdquo;</div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Row 3 -->
+          <article class="demo-card grid grid-cols-12 gap-6 lg:gap-10 py-10 lg:py-14 border-b border-[color:var(--ink)] cursor-default opacity-95">
+            <div class="col-span-12 lg:col-span-1">
+              <div class="mono text-[color:var(--accent)] text-lg">03</div>
+              <div class="mt-2 inline-flex items-center gap-1.5 mono text-[10px] uppercase tracking-[0.16em] opacity-60">
+                In build
+              </div>
+            </div>
+            <div class="col-span-12 lg:col-span-5">
+              <div class="label mb-3">Read + draft &middot; procurement</div>
+              <h4 class="display text-4xl lg:text-5xl font-medium mb-3">RFP response</h4>
+              <p class="text-[17px] leading-snug max-w-[42ch] opacity-80">
+                For when your city is the one <em>responding</em>, or evaluating.
+                Reads the RFP, builds the compliance matrix, flags the requirements you don&rsquo;t meet,
+                and drafts response sections weaving in your past wins.
+              </p>
+              <div class="mt-6 flex items-center gap-2 text-sm font-medium opacity-70">
+                <span>Coming soon</span>
+              </div>
+            </div>
+            <div class="col-span-12 lg:col-span-6">
+              <div class="preview-frame p-5 lg:p-6">
+                <div class="flex items-center justify-between mb-4">
+                  <div class="preview-dots">
+                    <span class="preview-dot"></span><span class="preview-dot"></span><span class="preview-dot"></span>
+                  </div>
+                  <div class="mono text-[10px] opacity-60">RFP-2026-DOT-441 · compliance matrix</div>
+                </div>
+                <div class="space-y-0">
+                  <div class="grid grid-cols-12 gap-2 py-2 border-b hairline text-sm">
+                    <div class="col-span-2 mono text-xs opacity-60">L.4.2.1</div>
+                    <div class="col-span-7">SOC 2 Type II (current)</div>
+                    <div class="col-span-3 text-right mono text-[color:var(--accent)] text-xs">MET</div>
+                  </div>
+                  <div class="grid grid-cols-12 gap-2 py-2 border-b hairline text-sm">
+                    <div class="col-span-2 mono text-xs opacity-60">L.4.2.2</div>
+                    <div class="col-span-7">FedRAMP Moderate ATO</div>
+                    <div class="col-span-3 text-right mono text-xs" style="color: var(--accent)">GAP — 4mo</div>
+                  </div>
+                  <div class="grid grid-cols-12 gap-2 py-2 border-b hairline text-sm">
+                    <div class="col-span-2 mono text-xs opacity-60">L.4.3.1</div>
+                    <div class="col-span-7">Past performance, &gt;$2M, public sector</div>
+                    <div class="col-span-3 text-right mono text-[color:var(--accent)] text-xs">MET ×3</div>
+                  </div>
+                  <div class="grid grid-cols-12 gap-2 py-2 text-sm">
+                    <div class="col-span-2 mono text-xs opacity-60">M.5.1</div>
+                    <div class="col-span-7">Section 508 conformance report</div>
+                    <div class="col-span-3 text-right mono text-[color:var(--accent)] text-xs">MET</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Row 4 -->
+          <article class="demo-card grid grid-cols-12 gap-6 lg:gap-10 py-10 lg:py-14 border-b border-[color:var(--ink)] cursor-default opacity-95">
+            <div class="col-span-12 lg:col-span-1">
+              <div class="mono text-[color:var(--accent)] text-lg">04</div>
+              <div class="mt-2 inline-flex items-center gap-1.5 mono text-[10px] uppercase tracking-[0.16em] opacity-60">
+                In build
+              </div>
+            </div>
+            <div class="col-span-12 lg:col-span-5">
+              <div class="label mb-3">Triage + respond &middot; constituent mail</div>
+              <h4 class="display text-4xl lg:text-5xl font-medium mb-3">Constituent triage</h4>
+              <p class="text-[17px] leading-snug max-w-[42ch] opacity-80">
+                For council offices, mayors, and 311 lines that get more mail than they can answer.
+                Classifies casework, policy comment, and FOIA. Routes correctly. Drafts replies in your office&rsquo;s voice.
+                Every decision logged, every draft reviewable.
+              </p>
+              <div class="mt-6 flex items-center gap-2 text-sm font-medium opacity-70">
+                <span>Coming soon</span>
+              </div>
+            </div>
+            <div class="col-span-12 lg:col-span-6">
+              <div class="preview-frame p-5 lg:p-6">
+                <div class="flex items-center justify-between mb-4">
+                  <div class="preview-dots">
+                    <span class="preview-dot"></span><span class="preview-dot"></span><span class="preview-dot"></span>
+                  </div>
+                  <div class="mono text-[10px] opacity-60">INBOX · district 7 · today</div>
+                </div>
+                <div class="space-y-0">
+                  <div class="flex items-center gap-3 py-2 border-b hairline">
+                    <span class="mono text-[10px] px-1.5 py-0.5 bg-[color:var(--accent)] text-[color:var(--paper)] rounded-sm">CASEWORK</span>
+                    <span class="text-sm flex-1 truncate">Resident — SNAP recertification not received</span>
+                    <span class="mono text-[10px] opacity-60">→ benefits team</span>
+                  </div>
+                  <div class="flex items-center gap-3 py-2 border-b hairline">
+                    <span class="mono text-[10px] px-1.5 py-0.5 bg-[color:var(--ink)] text-[color:var(--paper)] rounded-sm">POLICY</span>
+                    <span class="text-sm flex-1 truncate">Comment on draft zoning amendment</span>
+                    <span class="mono text-[10px] opacity-60">→ policy + log</span>
+                  </div>
+                  <div class="flex items-center gap-3 py-2 border-b hairline">
+                    <span class="mono text-[10px] px-1.5 py-0.5 border hairline rounded-sm">FOIA</span>
+                    <span class="text-sm flex-1 truncate">Records request — 2024 contracts &gt;$50k</span>
+                    <span class="mono text-[10px] opacity-60">→ counsel</span>
+                  </div>
+                  <div class="flex items-center gap-3 py-2">
+                    <span class="mono text-[10px] px-1.5 py-0.5 border hairline rounded-sm">THANKS</span>
+                    <span class="text-sm flex-1 truncate opacity-70">"thank you for the town hall last week…"</span>
+                    <span class="mono text-[10px] opacity-60">→ auto-reply</span>
+                  </div>
+                </div>
+                <div class="mt-3 mono text-[11px] opacity-60">
+                  <span class="num">847</span> processed · <span class="num">23</span> escalated · <span class="num">0</span> dropped
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Row 5 -->
+          <article class="demo-card grid grid-cols-12 gap-6 lg:gap-10 py-10 lg:py-14 cursor-default opacity-95">
+            <div class="col-span-12 lg:col-span-1">
+              <div class="mono text-[color:var(--accent)] text-lg">05</div>
+              <div class="mt-2 inline-flex items-center gap-1.5 mono text-[10px] uppercase tracking-[0.16em] opacity-60">
+                In build
+              </div>
+            </div>
+            <div class="col-span-12 lg:col-span-5">
+              <div class="label mb-3">Resolve &middot; municipal code</div>
+              <h4 class="display text-4xl lg:text-5xl font-medium mb-3">Code conflict audit</h4>
+              <p class="text-[17px] leading-snug max-w-[42ch] opacity-80">
+                Reads your full municipal code and surfaces what contradicts what,
+                what&rsquo;s redundant, and what just got quietly amended last Tuesday.
+                Every flag has a citation chain to the source ordinance.
+              </p>
+              <div class="mt-6 flex items-center gap-2 text-sm font-medium opacity-70">
+                <span>Coming soon</span>
+              </div>
+            </div>
+            <div class="col-span-12 lg:col-span-6">
+              <div class="preview-frame p-5 lg:p-6">
+                <div class="flex items-center justify-between mb-4">
+                  <div class="preview-dots">
+                    <span class="preview-dot"></span><span class="preview-dot"></span><span class="preview-dot"></span>
+                  </div>
+                  <div class="mono text-[10px] opacity-60">MUNI CODE · audit · 14,221 sections</div>
+                </div>
+                <div class="space-y-3 text-sm">
+                  <div>
+                    <div class="mono text-[10px] uppercase tracking-wider opacity-60 mb-1">Direct contradiction · 1</div>
+                    <div class="leading-snug"><span class="mono text-xs">§17.44.030</span> requires 1 parking space per ADU. <span class="mono text-xs">§17.44.090</span> (added 2024) prohibits parking minimums in transit zones. Same parcel, two rules.</div>
+                  </div>
+                  <div class="border-t hairline pt-3">
+                    <div class="mono text-[10px] uppercase tracking-wider opacity-60 mb-1">Redundant clauses · 6</div>
+                    <div class="opacity-80 leading-snug">Definition of "habitable space" is restated, with minor variation, across §15, §17, and §22. Recommend consolidation.</div>
+                  </div>
+                  <div class="border-t hairline pt-3">
+                    <div class="mono text-[10px] uppercase tracking-wider opacity-60 mb-1">Stale references · 3</div>
+                    <div class="opacity-80 leading-snug">§19.12 cites <span class="mono text-xs">2018 IBC</span>; jurisdiction adopted <span class="mono text-xs">2022 IBC</span> in March.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <p class="mono text-xs opacity-60 mt-8">
+          Note &middot; Permit review is live now. The other four are in active builds. Static previews above are sized to real outputs.
+        </p>
+      </div>
+    </section>
+
+    <!-- ======================== ESCAPE HATCHES ======================== -->
+    <section class="relative z-10 border-b hairline">
+      <div class="max-w-[1400px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
+        <div class="grid grid-cols-12 gap-6 lg:gap-10">
+          <div class="col-span-12 lg:col-span-2">
+            <div class="section-rule label">&sect; 04 / Other shapes</div>
+          </div>
+          <div class="col-span-12 lg:col-span-10">
+            <h3 class="display text-[8vw] md:text-[5vw] lg:text-[68px] font-medium max-w-[22ch]">
+              The five above are examples,<br/>
+              <span class="display-italic">not a menu.</span>
+            </h3>
+            <p class="mt-6 max-w-[58ch] text-lg leading-snug opacity-80">
+              Most of what we build is shaped to a specific city, county, or agency. The patterns repeat
+              (review, draft, triage, audit), but your code, your forms, your funders,
+              and your voice are always the source of truth.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-12 gap-6 lg:gap-10 mt-14 lg:mt-20">
+          <div class="col-span-12 lg:col-span-2"></div>
+
+          <a href="#contact" class="col-span-12 md:col-span-6 lg:col-span-5 group block border hairline p-8 lg:p-10 hover:bg-[color:var(--paper-deep)] transition-colors">
+            <div class="label mb-4">Custom build</div>
+            <h4 class="display text-3xl lg:text-4xl font-medium mb-4 max-w-[18ch]">
+              Tell us what part of your week<br/>you&rsquo;d hand off if you could.
+            </h4>
+            <p class="text-[16px] leading-snug opacity-80 max-w-[40ch]">
+              Two questions, no demo deck. If it&rsquo;s the kind of work we do well, we&rsquo;ll say so.
+              If it isn&rsquo;t, we&rsquo;ll point you somewhere better.
+            </p>
+            <div class="mt-6 mono text-sm flex items-center gap-2">
+              Start there <span class="caret">&rarr;</span>
+            </div>
+          </a>
+
+          <a href="#contact" class="col-span-12 md:col-span-6 lg:col-span-5 group block border hairline p-8 lg:p-10 bg-[color:var(--ink)] text-[color:var(--paper)] hover:bg-[color:var(--accent)] transition-colors">
+            <div class="label mb-4 opacity-70">City-wide rollout</div>
+            <h4 class="display text-3xl lg:text-4xl font-medium mb-4 max-w-[18ch]">
+              Rolling this out<br/>
+              <span class="display-italic">across departments?</span>
+            </h4>
+            <p class="text-[16px] leading-snug opacity-80 max-w-[40ch]">
+              Multi-department deployments, integrations with your existing systems (GIS, permitting, ERP, CRM),
+              procurement support, and the evals to prove it works at scale. We do those.
+            </p>
+            <div class="mt-6 mono text-sm flex items-center gap-2">
+              Let&rsquo;s talk <span class="caret">&rarr;</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================== MANIFESTO ======================== -->
+    <section id="manifesto" class="relative z-10 border-b hairline bg-[color:var(--ink)] text-[color:var(--paper)]">
+      <div class="max-w-[1400px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
+        <div class="grid grid-cols-12 gap-6 lg:gap-10">
+          <div class="col-span-12 lg:col-span-2">
+            <div class="section-rule label" style="border-color: var(--paper)">&sect; 05 / What we believe</div>
+          </div>
+          <div class="col-span-12 lg:col-span-10">
+            <h3 class="display text-[10vw] md:text-[7vw] lg:text-[96px] font-medium max-w-[16ch]">
+              Five things we'll<br/>
+              say out loud.
+            </h3>
+          </div>
+        </div>
+
+        <div class="mt-16 lg:mt-24 grid grid-cols-12 gap-6 lg:gap-10">
+          <div class="col-span-12 lg:col-span-2"></div>
+          <div class="col-span-12 lg:col-span-10 space-y-12 lg:space-y-16">
+
+            <div class="grid grid-cols-12 gap-6">
+              <div class="col-span-12 md:col-span-1 manifesto-num text-5xl lg:text-6xl">i.</div>
+              <div class="col-span-12 md:col-span-11">
+                <h4 class="display text-3xl lg:text-4xl font-medium mb-3 max-w-[28ch]">
+                  Most "AI strategy" is theater.
+                </h4>
+                <p class="text-lg leading-snug opacity-80 max-w-[60ch]">
+                  Pilots that never ship. Demos rehearsed on cherry-picked inputs. Decks that say
+                  "agentic" forty times. We're not interested. We ship things people use on Tuesdays.
+                </p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-12 gap-6">
+              <div class="col-span-12 md:col-span-1 manifesto-num text-5xl lg:text-6xl">ii.</div>
+              <div class="col-span-12 md:col-span-11">
+                <h4 class="display text-3xl lg:text-4xl font-medium mb-3 max-w-[28ch]">
+                  Without your data, the AI doesn&rsquo;t work.
+                </h4>
+                <p class="text-lg leading-snug opacity-80 max-w-[60ch]">
+                  A general model that knows the average of the internet will give you the average
+                  of the internet. That&rsquo;s exactly what you don&rsquo;t need. Your municipal code,
+                  your prior reviews, your funder relationships, your reviewer&rsquo;s voice: that&rsquo;s
+                  where the accuracy actually lives, and connecting it correctly is the part most
+                  vendors get wrong. The AI is the easy part. The data plumbing is the job, and
+                  it takes real expertise to get right.
+                </p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-12 gap-6">
+              <div class="col-span-12 md:col-span-1 manifesto-num text-5xl lg:text-6xl">iii.</div>
+              <div class="col-span-12 md:col-span-11">
+                <h4 class="display text-3xl lg:text-4xl font-medium mb-3 max-w-[28ch]">
+                  A chat box is not a product.
+                </h4>
+                <p class="text-lg leading-snug opacity-80 max-w-[60ch]">
+                  Sometimes the right interface is a form. Or a queue. Or a dashboard. Or a
+                  reviewable diff. We build whatever shape the work actually has, and we don't
+                  default to a chat window because it was easy.
+                </p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-12 gap-6">
+              <div class="col-span-12 md:col-span-1 manifesto-num text-5xl lg:text-6xl">iv.</div>
+              <div class="col-span-12 md:col-span-11">
+                <h4 class="display text-3xl lg:text-4xl font-medium mb-3 max-w-[28ch]">
+                  Evals or it didn't happen.
+                </h4>
+                <p class="text-lg leading-snug opacity-80 max-w-[60ch]">
+                  If we can't measure how often it's right, we don't ship it. If the number drops
+                  after a model update, we know within an hour. The unsexy infrastructure is the
+                  whole job.
+                </p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-12 gap-6">
+              <div class="col-span-12 md:col-span-1 manifesto-num text-5xl lg:text-6xl">v.</div>
+              <div class="col-span-12 md:col-span-11">
+                <h4 class="display text-3xl lg:text-4xl font-medium mb-3 max-w-[28ch]">
+                  The boring parts are the work.
+                </h4>
+                <p class="text-lg leading-snug opacity-80 max-w-[60ch]">
+                  Schemas. Permissions. Audit logs. Fallbacks. Versioning. The stuff nobody puts on
+                  a slide. That's where 75% becomes 99.5%, and that's what you're hiring us for.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================== PRICING ======================== -->
+    <section id="pricing" class="relative z-10 border-b hairline bg-[color:var(--paper-deep)]">
+      <div class="max-w-[1400px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
+        <div class="grid grid-cols-12 gap-6 lg:gap-10">
+          <div class="col-span-12 lg:col-span-2">
+            <div class="section-rule label">&sect; 06 / Pricing</div>
+          </div>
+          <div class="col-span-12 lg:col-span-10">
+            <h3 class="display text-[8vw] md:text-[5vw] lg:text-[68px] font-medium max-w-[20ch]">
+              Clear pricing,<br/>
+              <span class="display-italic">stated up front.</span>
+            </h3>
+            <p class="mt-6 max-w-[60ch] text-lg leading-snug opacity-80">
+              We don&rsquo;t do &ldquo;contact us for pricing.&rdquo; You&rsquo;re running a city. You don&rsquo;t have time
+              for a five-week sales cycle to find out if we&rsquo;re in your budget. Here&rsquo;s how it works:
+            </p>
+          </div>
+        </div>
+
+        <!-- Two-step pricing structure -->
+        <div class="grid grid-cols-12 gap-6 lg:gap-10 mt-14 lg:mt-20">
+          <div class="col-span-12 lg:col-span-2"></div>
+
+          <!-- Step 1: Implementation -->
+          <div class="col-span-12 lg:col-span-5">
+            <div class="bg-[color:var(--paper)] border hairline p-8 lg:p-10 h-full flex flex-col">
+              <div class="flex items-center justify-between mb-5">
+                <div class="label opacity-60">Step 1 &middot; one-time</div>
+                <div class="mono text-xs opacity-50">Required</div>
+              </div>
+              <h4 class="display text-3xl lg:text-4xl font-medium mb-2 leading-tight">Implementation</h4>
+              <p class="text-[15px] opacity-80 mb-6 leading-snug">
+                We tailor the agent to your jurisdiction. Your code, your forms, your prior decisions, your reviewers&rsquo; voice.
+                Data integrations included.
+              </p>
+              <div class="mb-6">
+                <div class="display text-5xl lg:text-6xl font-medium num">One fee</div>
+                <div class="mono text-xs opacity-60 mt-2">Quoted in writing after a 30-min scoping call. No surprises.</div>
+              </div>
+              <ul class="space-y-2.5 text-sm leading-snug border-t hairline pt-5 mt-auto">
+                <li class="flex gap-2">
+                  <span class="mono text-[color:var(--accent)] mt-0.5">&rarr;</span>
+                  <span>Agent configured against your municipal code in force</span>
+                </li>
+                <li class="flex gap-2">
+                  <span class="mono text-[color:var(--accent)] mt-0.5">&rarr;</span>
+                  <span>Integrations with your existing systems (permitting, GIS, CRM, ERP)</span>
+                </li>
+                <li class="flex gap-2">
+                  <span class="mono text-[color:var(--accent)] mt-0.5">&rarr;</span>
+                  <span>Voice &amp; format calibrated against your prior reviewer letters</span>
+                </li>
+                <li class="flex gap-2">
+                  <span class="mono text-[color:var(--accent)] mt-0.5">&rarr;</span>
+                  <span>Eval suite built on your real submittal history</span>
+                </li>
+                <li class="flex gap-2">
+                  <span class="mono text-[color:var(--accent)] mt-0.5">&rarr;</span>
+                  <span>Staff training and rollout support</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Step 2: Hosting -->
+          <div class="col-span-12 lg:col-span-5">
+            <div class="bg-[color:var(--paper)] border hairline p-8 lg:p-10 h-full flex flex-col">
+              <div class="flex items-center justify-between mb-5">
+                <div class="label opacity-60">Step 2 &middot; ongoing</div>
+                <div class="mono text-xs opacity-50">Your choice</div>
+              </div>
+              <h4 class="display text-3xl lg:text-4xl font-medium mb-2 leading-tight">Hosting</h4>
+              <p class="text-[15px] opacity-80 mb-6 leading-snug">
+                Once it&rsquo;s built, the agent is yours. Run it on your own infrastructure, or let us run it for you.
+              </p>
+
+              <div class="grid grid-cols-2 gap-3 mb-6">
+                <div class="border hairline p-4">
+                  <div class="label opacity-60 mb-1">Self-hosted</div>
+                  <div class="display text-3xl font-medium num">$0</div>
+                  <div class="mono text-[11px] opacity-60 mt-2">per year, ongoing</div>
+                  <div class="text-xs opacity-70 mt-3 leading-snug">You take the code and the model config. Run it where you want.</div>
+                </div>
+                <div class="border-2 border-[color:var(--ink)] p-4 bg-[color:var(--paper-deep)]">
+                  <div class="label mb-1" style="color: var(--accent)">We host</div>
+                  <div class="display text-3xl font-medium num">$5K&ndash;15K</div>
+                  <div class="mono text-[11px] opacity-60 mt-2">per year, all-in</div>
+                  <div class="text-xs opacity-70 mt-3 leading-snug">Range depends on agent complexity, data volume, and uptime needs.</div>
+                </div>
+              </div>
+
+              <ul class="space-y-2.5 text-sm leading-snug border-t hairline pt-5 mt-auto">
+                <li class="flex gap-2">
+                  <span class="mono text-[color:var(--accent)] mt-0.5">&rarr;</span>
+                  <span>Hosted plan includes infrastructure, model costs, monitoring, and updates</span>
+                </li>
+                <li class="flex gap-2">
+                  <span class="mono text-[color:var(--accent)] mt-0.5">&rarr;</span>
+                  <span>Continuous evals against your data. We see model drift before you do.</span>
+                </li>
+                <li class="flex gap-2">
+                  <span class="mono text-[color:var(--accent)] mt-0.5">&rarr;</span>
+                  <span>SLA, support, and a real human to call</span>
+                </li>
+                <li class="flex gap-2">
+                  <span class="mono text-[color:var(--accent)] mt-0.5">&rarr;</span>
+                  <span>Switch to self-hosted any time. The code is yours either way.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Math note -->
+        <div class="grid grid-cols-12 gap-6 lg:gap-10 mt-12">
+          <div class="col-span-12 lg:col-span-2"></div>
+          <div class="col-span-12 lg:col-span-10">
+            <div class="border-l-2 border-[color:var(--accent)] pl-5 max-w-[68ch]">
+              <div class="label mb-2" style="color: var(--accent)">Do the math</div>
+              <p class="text-lg leading-snug">
+                One reviewer&rsquo;s hour per week, at fully-loaded cost, pays for the hosted plan.
+                The cities we work with typically get back five to fifteen.
+                We&rsquo;re happy to walk through your specific numbers on a call.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom row: principles -->
+        <div class="grid grid-cols-12 gap-6 lg:gap-10 mt-16 pt-12 border-t hairline">
+          <div class="col-span-12 lg:col-span-2">
+            <div class="label opacity-60">House rules</div>
+          </div>
+          <div class="col-span-12 lg:col-span-10 grid sm:grid-cols-3 gap-8">
+            <div>
+              <div class="display text-xl font-medium mb-1.5">No per-seat fees.</div>
+              <div class="text-sm opacity-75 leading-snug">Add every employee in your city. We won&rsquo;t charge more.</div>
+            </div>
+            <div>
+              <div class="display text-xl font-medium mb-1.5">No per-token fees.</div>
+              <div class="text-sm opacity-75 leading-snug">Use it as much as you want. Model costs are our problem on the hosted plan.</div>
+            </div>
+            <div>
+              <div class="display text-xl font-medium mb-1.5">No surprise increases.</div>
+              <div class="text-sm opacity-75 leading-snug">Multi-year pricing locked at signing. We renegotiate openly or not at all.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================== FAQ ======================== -->
+    <section class="relative z-10 border-b hairline">
+      <div class="max-w-[1400px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
+        <div class="grid grid-cols-12 gap-6 lg:gap-10">
+          <div class="col-span-12 lg:col-span-2">
+            <div class="section-rule label">&sect; 07 / FAQ</div>
+          </div>
+          <div class="col-span-12 lg:col-span-10">
+            <h3 class="display text-[8vw] md:text-[5vw] lg:text-[68px] font-medium">
+              Reasonable<br/>questions.
+            </h3>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-12 gap-6 lg:gap-10 mt-16">
+          <div class="col-span-12 lg:col-span-2"></div>
+          <div class="col-span-12 lg:col-span-10 divide-y border-y hairline">
+
+            <details class="py-6 group">
+              <summary class="flex items-start justify-between gap-6">
+                <span class="display text-2xl lg:text-3xl font-medium pr-4">Why shouldn&rsquo;t we just use ChatGPT for this?</span>
+                <span class="plus mono text-3xl leading-none mt-2 text-[color:var(--accent)]">+</span>
+              </summary>
+              <p class="mt-4 max-w-[60ch] leading-snug opacity-80">
+                If the work doesn&rsquo;t punish a 25% error rate, please do. ChatGPT is great for that.
+                We&rsquo;re for the work where being wrong is expensive: in council embarrassment,
+                in litigation risk, in records requests, in dollars. And being right requires knowing
+                things a general model doesn&rsquo;t: your code, your prior decisions, your forms, your funders.
+              </p>
+            </details>
+
+            <details class="py-6 group">
+              <summary class="flex items-start justify-between gap-6">
+                <span class="display text-2xl lg:text-3xl font-medium pr-4">How does this fit our procurement?</span>
+                <span class="plus mono text-3xl leading-none mt-2 text-[color:var(--accent)]">+</span>
+              </summary>
+              <p class="mt-4 max-w-[60ch] leading-snug opacity-80">
+                We&rsquo;re available through several cooperative purchasing agreements, can respond to
+                RFPs directly, and have done piloted-then-purchased deployments before. Polco has been
+                through this thousands of times. We&rsquo;ll send the procurement person to the procurement person.
+              </p>
+            </details>
+
+            <details class="py-6 group">
+              <summary class="flex items-start justify-between gap-6">
+                <span class="display text-2xl lg:text-3xl font-medium pr-4">How long does a project take?</span>
+                <span class="plus mono text-3xl leading-none mt-2 text-[color:var(--accent)]">+</span>
+              </summary>
+              <p class="mt-4 max-w-[60ch] leading-snug opacity-80">
+                A tailored deployment of one of our existing products (e.g. permit review configured for your code)
+                is usually 4&ndash;8 weeks to a working system. Custom agents run 8&ndash;16 weeks. City-wide rollouts are
+                quarter-scale projects. We&rsquo;d rather give you a real number after a 30-minute call than a fake one now.
+              </p>
+            </details>
+
+            <details class="py-6 group">
+              <summary class="flex items-start justify-between gap-6">
+                <span class="display text-2xl lg:text-3xl font-medium pr-4">Who owns the model? The data? The outputs?</span>
+                <span class="plus mono text-3xl leading-none mt-2 text-[color:var(--accent)]">+</span>
+              </summary>
+              <p class="mt-4 max-w-[60ch] leading-snug opacity-80">
+                You do. We don&rsquo;t train on your data. We don&rsquo;t sell it. We don&rsquo;t pool it across
+                jurisdictions. Outputs are subject to your records-retention rules, not ours, and we
+                build with public records law in mind from day one.
+              </p>
+            </details>
+
+            <details class="py-6 group">
+              <summary class="flex items-start justify-between gap-6">
+                <span class="display text-2xl lg:text-3xl font-medium pr-4">What happens when the underlying models change?</span>
+                <span class="plus mono text-3xl leading-none mt-2 text-[color:var(--accent)]">+</span>
+              </summary>
+              <p class="mt-4 max-w-[60ch] leading-snug opacity-80">
+                Every system we build comes with an eval suite that runs continuously against your data.
+                When a model update shifts behavior, we see it before you do. That&rsquo;s not a feature;
+                it&rsquo;s the only responsible way to run this kind of software for a public agency.
+              </p>
+            </details>
+
+            <details class="py-6 group">
+              <summary class="flex items-start justify-between gap-6">
+                <span class="display text-2xl lg:text-3xl font-medium pr-4">Are you going to tell us we need a chatbot?</span>
+                <span class="plus mono text-3xl leading-none mt-2 text-[color:var(--accent)]">+</span>
+              </summary>
+              <p class="mt-4 max-w-[60ch] leading-snug opacity-80">
+                No. We might, sometimes, build something with a conversational element because it&rsquo;s
+                genuinely the right interface for one part of the workflow. But the product is the workflow.
+                The review, the draft, the queue. Not the chat.
+              </p>
+            </details>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================== CONTACT ======================== -->
+    <section id="contact" class="relative z-10 border-b hairline bg-[color:var(--paper-deep)]">
+      <div class="max-w-[1400px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
+        <div class="grid grid-cols-12 gap-6 lg:gap-10">
+          <div class="col-span-12 lg:col-span-2">
+            <div class="section-rule label">&sect; 08 / Contact</div>
+          </div>
+          <div class="col-span-12 lg:col-span-10">
+            <h3 class="display text-[9vw] md:text-[6vw] lg:text-[88px] font-medium max-w-[16ch]">
+              Tell us what your week<br/>
+              <span class="display-italic">is full of.</span>
+            </h3>
+            <p class="mt-6 max-w-[56ch] text-lg leading-snug opacity-80">
+              Four short questions. A real human reads every one. If we&rsquo;re a fit, we&rsquo;ll say so within
+              two business days. If we&rsquo;re not, we&rsquo;ll tell you that too, and probably point you
+              toward someone who is.
+            </p>
+          </div>
+        </div>
+
+        <form class="grid grid-cols-12 gap-6 lg:gap-10 mt-14" onsubmit="event.preventDefault(); alert('Wired up to Vercel function in production.');">
+          <div class="col-span-12 lg:col-span-2"></div>
+
+          <div class="col-span-12 lg:col-span-10 space-y-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <label class="label block mb-2 opacity-70">Your name</label>
+                <input class="field" type="text" placeholder="Jane Doe" required />
+              </div>
+              <div>
+                <label class="label block mb-2 opacity-70">Work email</label>
+                <input class="field" type="email" placeholder="jane@org.gov" required />
+              </div>
+            </div>
+
+            <div>
+              <label class="label block mb-2 opacity-70">Which best describes you?</label>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" class="pill text-sm hover:bg-[color:var(--ink)] hover:text-[color:var(--paper)] transition-colors">City / municipality</button>
+                <button type="button" class="pill text-sm hover:bg-[color:var(--ink)] hover:text-[color:var(--paper)] transition-colors">County</button>
+                <button type="button" class="pill text-sm hover:bg-[color:var(--ink)] hover:text-[color:var(--paper)] transition-colors">State agency</button>
+                <button type="button" class="pill text-sm hover:bg-[color:var(--ink)] hover:text-[color:var(--paper)] transition-colors">Special district / authority</button>
+                <button type="button" class="pill text-sm hover:bg-[color:var(--ink)] hover:text-[color:var(--paper)] transition-colors">Something else</button>
+              </div>
+            </div>
+
+            <div>
+              <label class="label block mb-2 opacity-70">What part of the work is wasting time?</label>
+              <textarea class="field resize-none" rows="3" placeholder="Be specific. &lsquo;Reviewing 200 permit submittals a week against a code that updated last month&rsquo; beats &lsquo;we want to use AI.&rsquo;"></textarea>
+            </div>
+
+            <div>
+              <label class="label block mb-2 opacity-70">Which best describes what you&rsquo;re looking for?</label>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" class="pill text-sm hover:bg-[color:var(--ink)] hover:text-[color:var(--paper)] transition-colors">One of the five examples, tailored to us</button>
+                <button type="button" class="pill text-sm hover:bg-[color:var(--ink)] hover:text-[color:var(--paper)] transition-colors">A custom agent for our workflow</button>
+                <button type="button" class="pill text-sm hover:bg-[color:var(--ink)] hover:text-[color:var(--paper)] transition-colors">City-wide / multi-department rollout</button>
+                <button type="button" class="pill text-sm hover:bg-[color:var(--ink)] hover:text-[color:var(--paper)] transition-colors">Honestly not sure yet</button>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-4 pt-4">
+              <button type="submit" class="btn-primary px-6 py-3 text-sm">
+                Send it <span class="caret">→</span>
+              </button>
+              <span class="mono text-xs opacity-60">No sales sequence. No drip campaign. Just a reply.</span>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ======================== FOOTER ======================== -->
+    <footer class="relative z-10">
+      <div class="max-w-[1400px] mx-auto px-6 lg:px-10 py-12">
+        <div class="grid grid-cols-12 gap-6 lg:gap-10 items-end">
+          <div class="col-span-12 lg:col-span-6">
+            <div class="flex items-baseline gap-4 flex-wrap">
+              <div class="display text-5xl lg:text-7xl font-medium leading-none">Capa<span style="color: var(--accent)">C</span>ity</div>
+              <div class="mono text-xs uppercase tracking-[0.16em] opacity-60">by Polco</div>
+            </div>
+            <p class="mono text-xs opacity-60 mt-4">
+              Agentic systems for local government. Est. 2026.
+            </p>
+          </div>
+          <div class="col-span-6 lg:col-span-3">
+            <div class="label mb-3 opacity-60">Site</div>
+            <ul class="space-y-1.5 text-sm">
+              <li><a href="#examples" class="hover:text-[color:var(--accent)]">Examples</a></li>
+              <li><a href="#approach" class="hover:text-[color:var(--accent)]">Approach</a></li>
+              <li><a href="#manifesto" class="hover:text-[color:var(--accent)]">What we believe</a></li>
+              <li><a href="#why" class="hover:text-[color:var(--accent)]">Why us</a></li>
+              <li><a href="#pricing" class="hover:text-[color:var(--accent)]">Pricing</a></li>
+              <li><a href="#contact" class="hover:text-[color:var(--accent)]">Contact</a></li>
+            </ul>
+          </div>
+          <div class="col-span-6 lg:col-span-3">
+            <div class="label mb-3 opacity-60">Elsewhere</div>
+            <ul class="space-y-1.5 text-sm">
+              <li><a href="#" class="hover:text-[color:var(--accent)]">hello@capacity.polco.us</a></li>
+              <li><a href="#" class="hover:text-[color:var(--accent)]">polco.us</a></li>
+              <li><a href="#" class="hover:text-[color:var(--accent)]">LinkedIn</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="mt-12 pt-6 border-t hairline flex flex-wrap items-center justify-between gap-4">
+          <div class="mono text-xs opacity-50">&copy; 2026 Polco, Inc. &middot; CapaCity is a Polco product.</div>
+          <div class="mono text-xs opacity-50">Built with the boring parts done right.</div>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

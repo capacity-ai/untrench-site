@@ -84,17 +84,23 @@ export async function POST(req: NextRequest) {
 
   // Send email via Resend
   const resendApiKey = process.env.RESEND_API_KEY;
+  console.log('[contact] RESEND_API_KEY present:', !!resendApiKey);
   if (resendApiKey) {
     try {
       const resend = new Resend(resendApiKey);
-      await resend.emails.send({
-        from: 'Untrench Contact <onboarding@resend.dev>',
+      const { data, error } = await resend.emails.send({
+        from: 'Untrench Contact <contact@untrench.work>',
         to: ['alex.aitest@polco.us', 'alex@polco.us'],
         subject: `New contact form submission from ${body.name}`,
         text: message,
       });
+      if (error) {
+        console.error('Resend email error:', JSON.stringify(error));
+      } else {
+        console.log('Resend email sent, id:', data?.id);
+      }
     } catch (err) {
-      console.error('Resend email error:', err);
+      console.error('Resend email error (thrown):', err);
       // Graceful fallback — don't 500 the user
     }
   } else {

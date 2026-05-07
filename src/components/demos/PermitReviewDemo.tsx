@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { SCENARIOS, ScenarioKey, Issue, ChatMessage } from '@/lib/permit-scenarios';
 import { captureDemoStarted, captureDemoCompleted } from '@/lib/posthog';
 
@@ -103,94 +103,41 @@ function AppWindow({
   );
 }
 
-// ─── Chat panel ───────────────────────────────────────────────────────────────
+// ─── Confetti ─────────────────────────────────────────────────────────────────
 
-function ChatPanel({
-  messages,
-  isWorking,
-  reviewer,
-}: {
-  messages: { text: string }[];
-  isWorking: boolean;
-  reviewer: string;
-}) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages, isWorking]);
+function Confetti() {
+  const pieces = useMemo(() =>
+    Array.from({ length: 80 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      delay: Math.random() * 1.4,
+      duration: 2.2 + Math.random() * 2,
+      color: ['#b8351a', '#febc2e', '#28c840', '#1e3a6e', '#c98a1a', '#f4d4be', '#15130f'][Math.floor(Math.random() * 7)],
+      size: 5 + Math.random() * 9,
+      rotation: Math.random() * 360,
+      circle: Math.random() > 0.55,
+    })),
+    []
+  );
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-2 flex-shrink-0">
-        <div className="label opacity-60" style={{ fontSize: '10px' }}>Agent</div>
-        <span className="mono text-[9px] opacity-40">{reviewer.split(' (')[0]}</span>
-      </div>
-
-      {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-2 scroll-area min-h-0 pr-0.5">
-        {messages.length === 0 ? (
-          <div className="text-[11px] opacity-30 italic py-8 text-center leading-relaxed">
-            Agent will narrate<br />findings as it works.
-          </div>
-        ) : (
-          messages.map((msg, i) => (
-            <div key={i} className="flex gap-2 items-start">
-              <div
-                className="flex-shrink-0 w-[18px] h-[18px] rounded flex items-center justify-center text-[7px] font-bold mt-0.5 leading-none"
-                style={{ background: 'var(--accent)', color: 'var(--paper)', letterSpacing: '0.04em' }}
-              >
-                AI
-              </div>
-              <div
-                className="text-[11.5px] leading-snug rounded px-2 py-1.5 flex-1"
-                style={{ background: 'var(--paper-deep)', border: '1px solid var(--rule)' }}
-              >
-                {msg.text}
-              </div>
-            </div>
-          ))
-        )}
-
-        {/* Typing indicator */}
-        {isWorking && (
-          <div className="flex gap-2 items-start">
-            <div
-              className="flex-shrink-0 w-[18px] h-[18px] rounded flex items-center justify-center text-[7px] font-bold"
-              style={{ background: 'var(--accent)', color: 'var(--paper)' }}
-            >
-              AI
-            </div>
-            <div
-              className="text-[13px] rounded px-2.5 py-1"
-              style={{ background: 'var(--paper-deep)', border: '1px solid var(--rule)', letterSpacing: '0.1em' }}
-            >
-              <span className="opacity-30 animate-pulse">· · ·</span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Input (disabled — demo mode) */}
-      <div className="mt-2 pt-2 border-t hairline flex-shrink-0">
-        <div className="flex gap-1.5 items-center">
-          <input
-            type="text"
-            disabled
-            placeholder={isWorking ? 'Review in progress…' : 'Demo mode — input disabled'}
-            className="flex-1 text-[10.5px] px-2 py-1 border hairline rounded opacity-30 cursor-not-allowed bg-transparent"
-          />
-          <button
-            disabled
-            className="text-[10.5px] px-2 py-1 border hairline rounded opacity-20 cursor-not-allowed whitespace-nowrap"
-          >
-            Send
-          </button>
-        </div>
-      </div>
+    <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 9999 }}>
+      {pieces.map(p => (
+        <div
+          key={p.id}
+          style={{
+            position: 'absolute',
+            left: `${p.x}%`,
+            top: -16,
+            width: p.size,
+            height: p.size,
+            background: p.color,
+            borderRadius: p.circle ? '50%' : 2,
+            animation: `confettiFall ${p.duration}s ${p.delay}s ease-in forwards`,
+            transform: `rotate(${p.rotation}deg)`,
+          }}
+        />
+      ))}
     </div>
   );
 }
@@ -239,10 +186,10 @@ export default function PermitReviewDemo() {
   const [chatMsgs, setChatMsgs] = useState<{ text: string }[]>([]);
   const [letterVisible, setLetterVisible] = useState(false);
   const [readPct, setReadPct] = useState(0);
+  const [emailSent, setEmailSent] = useState(false);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const startTimeRef = useRef<number>(0);
   const reasoningRef = useRef<HTMLDivElement>(null);
-  const letterRef = useRef<HTMLDivElement>(null);
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach(clearTimeout);
@@ -257,11 +204,7 @@ export default function PermitReviewDemo() {
     }
   }, [steps]);
 
-  useEffect(() => {
-    if (letterVisible && letterRef.current) {
-      setTimeout(() => letterRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
-    }
-  }, [letterVisible]);
+  // Letter appears naturally as page grows — no forced scroll
 
   function runScenario(key: ScenarioKey) {
     const scenario = SCENARIOS[key];
@@ -321,6 +264,7 @@ export default function PermitReviewDemo() {
     setChatMsgs([]);
     setLetterVisible(false);
     setReadPct(0);
+    setEmailSent(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -405,11 +349,11 @@ export default function PermitReviewDemo() {
         {isActive && scenario && (
           <div
             className="grid"
-            style={{ gridTemplateColumns: '280px 1fr 300px', minHeight: '620px', maxHeight: '80vh' }}
+            style={{ gridTemplateColumns: '280px 1fr 300px' }}
           >
-            {/* Left: Submittal form */}
+            {/* Left: Submittal form — grows with content, page scrolls */}
             <aside
-              className="border-r hairline overflow-y-auto scroll-area"
+              className="border-r hairline"
               style={{ background: 'var(--paper)' }}
             >
               <div className="p-4">
@@ -426,9 +370,9 @@ export default function PermitReviewDemo() {
               </div>
             </aside>
 
-            {/* Center: Findings + letter */}
+            {/* Center: Findings + letter — grows with content, page scrolls */}
             <div
-              className="overflow-y-auto scroll-area border-r hairline"
+              className="border-r hairline"
               style={{ background: 'var(--paper)' }}
             >
               <div className="p-5">
@@ -455,7 +399,7 @@ export default function PermitReviewDemo() {
 
                 {/* Reviewer letter */}
                 {letterVisible && (
-                  <div ref={letterRef} className="mt-8">
+                  <div className="mt-8">
                     <div className="flex items-center justify-between mb-3">
                       <div className="label opacity-60">Draft &middot; reviewer&rsquo;s letter</div>
                       <span className="status-pill" style={{ borderColor: 'var(--green)', color: 'var(--green)' }}>
@@ -473,39 +417,109 @@ export default function PermitReviewDemo() {
                       </div>
                       <div dangerouslySetInnerHTML={{ __html: scenario.letter.body }} />
                     </div>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <button className="btn-ghost px-4 py-2 text-xs">Open in editor</button>
-                      <button className="btn-ghost px-4 py-2 text-xs">Send to applicant queue</button>
-                      <button className="btn-ghost px-4 py-2 text-xs">Export PDF</button>
-                      <button onClick={handleReset} className="btn-primary px-4 py-2 text-xs ml-auto">
-                        Try another scenario <span className="caret">&rarr;</span>
-                      </button>
-                    </div>
+                    {emailSent ? (
+                      <>
+                        <Confetti />
+                        <div className="mt-6 p-8 border hairline text-center" style={{ background: 'var(--paper-deep)' }}>
+                          <div className="display text-5xl font-medium mb-3 leading-tight">
+                            That was<br /><span className="display-italic">easy.</span>
+                          </div>
+                          <p className="text-sm opacity-60 mb-7 max-w-[36ch] mx-auto leading-relaxed">
+                            Email queued for the applicant. {scenario.reviewer.split(' (')[0]} has been notified.
+                          </p>
+                          <div className="flex items-center justify-center gap-3 flex-wrap">
+                            <button onClick={handleReset} className="btn-primary px-6 py-3 text-sm">
+                              Try another scenario <span className="caret">&rarr;</span>
+                            </button>
+                            <a href="/#contact" className="btn-ghost px-6 py-3 text-sm">
+                              Talk to us <span className="caret">&rarr;</span>
+                            </a>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="mt-4 flex items-center gap-3 flex-wrap">
+                        <button
+                          className="btn-primary px-4 py-2 text-xs"
+                          onClick={() => setEmailSent(true)}
+                        >
+                          Send as an email to applicant <span className="caret">&rarr;</span>
+                        </button>
+                        <button onClick={handleReset} className="btn-ghost px-4 py-2 text-xs">
+                          Try another scenario
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Right: Chat + Reasoning stacked */}
-            <aside
-              className="flex flex-col overflow-hidden"
-              style={{ background: 'var(--paper-deep)' }}
-            >
-              {/* Chat panel (top ~58%) */}
-              <div
-                className="flex flex-col p-4 border-b hairline"
-                style={{ flex: '0 0 58%', minHeight: 0 }}
-              >
-                <ChatPanel
-                  messages={chatMsgs}
-                  isWorking={isWorking}
-                  reviewer={scenario.reviewer}
-                />
+            {/* Right: Chat + Reasoning — natural flow, each panel has its own bounded scroll */}
+            <aside style={{ background: 'var(--paper-deep)' }}>
+              {/* Chat panel */}
+              <div className="p-4 border-b hairline">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="label opacity-60" style={{ fontSize: '10px' }}>Agent</div>
+                  <span className="mono text-[9px] opacity-40">{scenario.reviewer.split(' (')[0]}</span>
+                </div>
+                <div className="max-h-72 overflow-y-auto scroll-area space-y-2 pr-0.5">
+                  {chatMsgs.length === 0 ? (
+                    <div className="text-[11px] opacity-30 italic py-8 text-center leading-relaxed">
+                      Agent will narrate<br />findings as it works.
+                    </div>
+                  ) : (
+                    chatMsgs.map((msg, i) => (
+                      <div key={i} className="flex gap-2 items-start">
+                        <div
+                          className="flex-shrink-0 w-[18px] h-[18px] rounded flex items-center justify-center text-[7px] font-bold mt-0.5 leading-none"
+                          style={{ background: 'var(--accent)', color: 'var(--paper)', letterSpacing: '0.04em' }}
+                        >
+                          AI
+                        </div>
+                        <div
+                          className="text-[11.5px] leading-snug rounded px-2 py-1.5 flex-1"
+                          style={{ background: 'var(--paper)', border: '1px solid var(--rule)' }}
+                        >
+                          {msg.text}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                  {isWorking && (
+                    <div className="flex gap-2 items-start">
+                      <div
+                        className="flex-shrink-0 w-[18px] h-[18px] rounded flex items-center justify-center text-[7px] font-bold"
+                        style={{ background: 'var(--accent)', color: 'var(--paper)' }}
+                      >
+                        AI
+                      </div>
+                      <div
+                        className="text-[13px] rounded px-2.5 py-1"
+                        style={{ background: 'var(--paper)', border: '1px solid var(--rule)', letterSpacing: '0.1em' }}
+                      >
+                        <span className="opacity-30 animate-pulse">· · ·</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {/* Disabled input */}
+                <div className="mt-2 pt-2 border-t hairline flex gap-1.5 items-center">
+                  <input
+                    type="text"
+                    disabled
+                    placeholder={isWorking ? 'Review in progress…' : 'Demo mode — input disabled'}
+                    className="flex-1 text-[10.5px] px-2 py-1 border hairline rounded opacity-30 cursor-not-allowed bg-transparent"
+                  />
+                  <button disabled className="text-[10.5px] px-2 py-1 border hairline rounded opacity-20 cursor-not-allowed whitespace-nowrap">
+                    Send
+                  </button>
+                </div>
               </div>
 
-              {/* Reasoning trail (bottom ~42%) */}
-              <div className="flex flex-col p-4" style={{ flex: '1 1 0', minHeight: 0 }}>
-                <div className="flex items-center justify-between mb-2 flex-shrink-0">
+              {/* Reasoning trail */}
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-2">
                   <div className="label opacity-40" style={{ fontSize: '9px' }}>Internal reasoning</div>
                   {phase === 'complete' ? (
                     <span className="mono text-[9px]" style={{ color: 'var(--green)' }}>done</span>
@@ -513,10 +527,7 @@ export default function PermitReviewDemo() {
                     <span className="mono text-[9px] opacity-40">live</span>
                   )}
                 </div>
-                <div
-                  ref={reasoningRef}
-                  className="flex-1 overflow-y-auto scroll-area space-y-2 min-h-0"
-                >
+                <div ref={reasoningRef} className="max-h-56 overflow-y-auto scroll-area space-y-2">
                   {steps.length === 0 && (
                     <div className="text-[10px] opacity-25 italic py-4 text-center">
                       Steps will appear here.
@@ -526,14 +537,8 @@ export default function PermitReviewDemo() {
                     <div key={i} className="step flex gap-2 text-[11px] leading-snug">
                       <div className={`step-icon ${step.status}`} style={{ width: 14, height: 14, marginTop: 2 }} />
                       <div className="flex-1 min-w-0">
-                        <div
-                          className="font-medium text-[10.5px]"
-                          dangerouslySetInnerHTML={{ __html: step.text }}
-                        />
-                        <div
-                          className="opacity-50 text-[9.5px] mt-0.5 leading-snug mono"
-                          dangerouslySetInnerHTML={{ __html: step.detail }}
-                        />
+                        <div className="font-medium text-[10.5px]" dangerouslySetInnerHTML={{ __html: step.text }} />
+                        <div className="opacity-50 text-[9.5px] mt-0.5 leading-snug mono" dangerouslySetInnerHTML={{ __html: step.detail }} />
                       </div>
                     </div>
                   ))}

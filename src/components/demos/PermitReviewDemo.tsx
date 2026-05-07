@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import Link from 'next/link';
 import { SCENARIOS, ScenarioKey, Issue, ChatMessage } from '@/lib/permit-scenarios';
 import { captureDemoStarted, captureDemoCompleted } from '@/lib/posthog';
 
@@ -431,9 +432,9 @@ export default function PermitReviewDemo() {
                             <button onClick={handleReset} className="btn-primary px-6 py-3 text-sm">
                               Try another scenario <span className="caret">&rarr;</span>
                             </button>
-                            <a href="/#contact" className="btn-ghost px-6 py-3 text-sm">
+                            <Link href="/#contact" className="btn-ghost px-6 py-3 text-sm">
                               Talk to us <span className="caret">&rarr;</span>
-                            </a>
+                            </Link>
                           </div>
                         </div>
                       </>

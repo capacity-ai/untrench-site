@@ -8,7 +8,7 @@ export default function Manifesto() {
           </div>
           <div className="col-span-12 lg:col-span-10">
             <h3 className="display text-[10vw] md:text-[7vw] lg:text-[96px] font-medium max-w-[16ch]">
-              Five things we&rsquo;ll<br />
+              Five things we&rsquo;ll{/* br-ok */}<br />
               say out loud.
             </h3>
           </div>

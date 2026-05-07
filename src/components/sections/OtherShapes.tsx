@@ -10,13 +10,13 @@ export default function OtherShapes() {
           </div>
           <div className="col-span-12 lg:col-span-10">
             <h3 className="display text-[8vw] md:text-[5vw] lg:text-[68px] font-medium max-w-[22ch]">
-              The five above are examples,<br />
+              The five above are examples,{/* br-ok */}<br />
               <span className="display-italic">not a menu.</span>
             </h3>
             <p className="mt-6 max-w-[58ch] text-lg leading-snug opacity-80">
               Most of what we build is shaped to a specific city, county, or agency. The patterns repeat
-              (review, draft, triage, audit), but your code, your forms, your funders,
-              and your voice are always the source of truth.
+              — review, draft, triage, audit — but the jurisdiction is always the source of truth:
+              the code in force, adopted standards, how things have actually been decided.
             </p>
           </div>
         </div>
@@ -32,11 +32,11 @@ export default function OtherShapes() {
           >
             <div className="label mb-4">Custom build</div>
             <h4 className="display text-3xl lg:text-4xl font-medium mb-4 max-w-[18ch]">
-              Tell us what part of your week<br />you&rsquo;d hand off if you could.
+              What&rsquo;s the most wasteful part{/* br-ok */}<br />of your team&rsquo;s week?
             </h4>
             <p className="text-[16px] leading-snug opacity-80 max-w-[40ch]">
-              Two questions, no demo deck. If it&rsquo;s the kind of work we do well, we&rsquo;ll say so.
-              If it isn&rsquo;t, we&rsquo;ll point you somewhere better.
+              Tell us what&rsquo;s eating your staff&rsquo;s time. Two questions, no deck.
+              If it&rsquo;s something we can fix, we&rsquo;ll say so. If it isn&rsquo;t, we&rsquo;ll say that too.
             </p>
             <div className="mt-6 mono text-sm flex items-center gap-2">
               Start there <span className="caret">&rarr;</span>
@@ -51,7 +51,7 @@ export default function OtherShapes() {
           >
             <div className="label mb-4 opacity-70">City-wide rollout</div>
             <h4 className="display text-3xl lg:text-4xl font-medium mb-4 max-w-[18ch]">
-              Rolling this out<br />
+              Rolling this out{/* br-ok */}<br />
               <span className="display-italic">across departments?</span>
             </h4>
             <p className="text-[16px] leading-snug opacity-80 max-w-[40ch]">

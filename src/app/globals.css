@@ -7,8 +7,8 @@
   --paper: #f1ece0;
   --paper-deep: #e7e0cd;
   --paper-deeper: #d9d0b5;
-  --accent: #b8351a;
-  --accent-soft: #f4d4be;
+  --accent: #1d4175;
+  --accent-soft: #ccd8f0;
   --green: #2d6a4f;
   --rule: rgba(21, 19, 15, 0.18);
 }
@@ -25,21 +25,18 @@ body {
 /* Typography */
 .display {
   font-family: var(--font-fraunces), serif;
-  font-variation-settings: 'opsz' 144, 'SOFT' 30;
-  letter-spacing: -0.038em;
+  letter-spacing: -0.02em;
   line-height: 0.92;
 }
 .display-italic {
   font-family: var(--font-fraunces), serif;
   font-style: italic;
-  font-variation-settings: 'opsz' 144;
 }
 .display-italic-heavy {
   font-family: var(--font-fraunces), serif;
   font-style: italic;
   font-weight: 700;
-  font-variation-settings: 'opsz' 144;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.025em;
 }
 .label {
   font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
@@ -171,7 +168,6 @@ body::before {
 /* Manifesto numbering */
 .manifesto-num {
   font-family: var(--font-fraunces), serif;
-  font-variation-settings: 'opsz' 144;
   font-weight: 400;
   font-style: italic;
   color: var(--accent);
@@ -185,8 +181,8 @@ body::before {
   animation: pulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 @keyframes pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(184, 53, 26, 0.5); }
-  50% { box-shadow: 0 0 0 10px rgba(184, 53, 26, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(29, 65, 117, 0.5); }
+  50% { box-shadow: 0 0 0 10px rgba(29, 65, 117, 0); }
 }
 
 /* Accordion */
@@ -259,8 +255,8 @@ a:hover .caret, button:hover .caret { transform: translateX(3px); }
   animation: pulse-ring 1.4s ease-in-out infinite;
 }
 @keyframes pulse-ring {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(184,53,26,0.6); }
-  50% { box-shadow: 0 0 0 6px rgba(184,53,26,0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(29,65,117,0.6); }
+  50% { box-shadow: 0 0 0 6px rgba(29,65,117,0); }
 }
 
 /* Issue card */
@@ -292,7 +288,6 @@ a:hover .caret, button:hover .caret { transform: translateX(3px); }
   background: var(--paper);
   border: 1px solid var(--rule);
   font-family: var(--font-fraunces), serif;
-  font-variation-settings: 'opsz' 14;
   line-height: 1.55;
 }
 
@@ -309,8 +304,8 @@ a:hover .caret, button:hover .caret { transform: translateX(3px); }
   animation: live 1.6s ease-in-out infinite;
 }
 @keyframes live {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(184,53,26,0.6); }
-  50% { box-shadow: 0 0 0 5px rgba(184,53,26,0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(29,65,117,0.6); }
+  50% { box-shadow: 0 0 0 5px rgba(29,65,117,0); }
 }
 
 /* Status pill */
@@ -333,6 +328,5 @@ a:hover .caret, button:hover .caret { transform: translateX(3px); }
   background-image: repeating-linear-gradient(0deg, transparent 0 23px, rgba(21,19,15,0.05) 23px 24px);
   border: 1px solid var(--rule);
   font-family: var(--font-fraunces), serif;
-  font-variation-settings: 'opsz' 14;
   line-height: 24px;
 }

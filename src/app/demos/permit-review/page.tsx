@@ -3,9 +3,9 @@ import Link from 'next/link';
 import PermitReviewDemo from '@/components/demos/PermitReviewDemo';
 
 export const metadata: Metadata = {
-  title: 'Permit Review Demo &middot; Untrench',
+  title: 'Permit Review Demo &middot; National AI Lab',
   description:
-    'Watch the Untrench permit review agent read a submittal, cross-reference the code in force, and draft the reviewer\'s letter — in real time.',
+    'Watch the National AI Lab permit review agent read a submittal, cross-reference the code in force, and draft the reviewer\'s letter — in real time.',
 };
 
 export default function PermitReviewPage() {
@@ -23,7 +23,7 @@ export default function PermitReviewPage() {
                 <rect x="12" y="12" width="9" height="9" fill="currentColor" />
               </svg>
               <span className="display text-[18px] font-semibold">
-                Untrench
+                National AI Lab
               </span>
               <span className="hidden sm:inline-block mono text-[10px] uppercase tracking-[0.16em] opacity-60 border-l hairline pl-3">
                 by Polco

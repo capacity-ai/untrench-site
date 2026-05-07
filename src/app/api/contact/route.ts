@@ -11,7 +11,7 @@ interface ContactPayload {
 
 function formatSlackMessage(payload: ContactPayload): string {
   const lines = [
-    `*New contact form submission — Untrench*`,
+    `*New contact form submission — National AI Lab*`,
     `*Name:* ${payload.name}`,
     `*Email:* ${payload.email}`,
     payload.orgType ? `*Org type:* ${payload.orgType}` : null,

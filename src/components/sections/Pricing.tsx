@@ -8,7 +8,7 @@ export default function Pricing() {
           </div>
           <div className="col-span-12 lg:col-span-10">
             <h3 className="display text-[8vw] md:text-[5vw] lg:text-[68px] font-medium max-w-[20ch]">
-              Clear pricing,<br />
+              Clear pricing,{/* br-ok */}<br />
               <span className="display-italic">stated up front.</span>
             </h3>
             <p className="mt-6 max-w-[60ch] text-lg leading-snug opacity-80">
@@ -30,12 +30,12 @@ export default function Pricing() {
               </div>
               <h4 className="display text-3xl lg:text-4xl font-medium mb-2 leading-tight">Implementation</h4>
               <p className="text-[15px] opacity-80 mb-6 leading-snug">
-                We tailor the agent to your jurisdiction. Your code, your forms, your prior decisions, your reviewers&rsquo; voice.
+                We configure the agent against your code, your adopted forms, and the way your reviewers actually write.
                 Data integrations included.
               </p>
               <div className="mb-6">
-                <div className="display text-5xl lg:text-6xl font-medium num">One fee</div>
-                <div className="mono text-xs opacity-60 mt-2">Quoted in writing after a 30-min scoping call. No surprises.</div>
+                <div className="display text-5xl lg:text-6xl font-medium num">Median $8K&ndash;$10K</div>
+                <div className="mono text-xs opacity-60 mt-2">Can be well under or well over depending on complexity. Quoted in writing after a 30-min scoping call.</div>
               </div>
               <ul className="space-y-2.5 text-sm leading-snug border-t hairline pt-5 mt-auto">
                 <li className="flex gap-2">

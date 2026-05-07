@@ -149,7 +149,7 @@ export default function PermitReviewDemo() {
             <div className="mb-8">
               <div className="label mb-3 opacity-70">Step 1 of 2</div>
               <h1 className="display text-4xl lg:text-6xl font-medium leading-[0.95] mb-4 max-w-[20ch]">
-                Pick a permit submittal.<br />
+                Pick a permit submittal.{/* br-ok */}<br />
                 <span className="display-italic">Watch us review it.</span>
               </h1>
               <p className="text-lg leading-snug opacity-80 max-w-[60ch]">

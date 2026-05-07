@@ -5,7 +5,7 @@ export default function Footer() {
         <div className="grid grid-cols-12 gap-6 lg:gap-10 items-end">
           <div className="col-span-12 lg:col-span-6">
             <div className="flex items-baseline gap-4 flex-wrap">
-              <div className="display text-5xl lg:text-7xl font-medium leading-none">Untrench</div>
+              <div className="display text-5xl lg:text-7xl font-medium leading-none">National AI Lab</div>
               <div className="mono text-xs uppercase tracking-[0.16em] opacity-60">by Polco</div>
             </div>
             <p className="mono text-xs opacity-60 mt-4">
@@ -28,7 +28,7 @@ export default function Footer() {
           <div className="col-span-6 lg:col-span-3">
             <div className="label mb-3 opacity-60">Elsewhere</div>
             <ul className="space-y-1.5 text-sm">
-              <li><a href="mailto:hello@untrench.work" className="hover:text-[color:var(--accent)]">hello@untrench.work</a></li>
+              <li><a href="mailto:hello@nationalailab.us" className="hover:text-[color:var(--accent)]">hello@nationalailab.us</a></li>
               <li><a href="https://polco.us" target="_blank" rel="noopener noreferrer" className="hover:text-[color:var(--accent)]">polco.us</a></li>
               <li><a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-[color:var(--accent)]">LinkedIn</a></li>
             </ul>
@@ -36,7 +36,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 pt-6 border-t hairline flex flex-wrap items-center justify-between gap-4">
-          <div className="mono text-xs opacity-50">&copy; 2026 Polco, Inc. &middot; Untrench is a Polco product.</div>
+          <div className="mono text-xs opacity-50">&copy; 2026 Polco, Inc. &middot; National AI Lab is a Polco product.</div>
           <div className="mono text-xs opacity-50">Built with the boring parts done right.</div>
         </div>
       </div>

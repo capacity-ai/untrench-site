@@ -72,8 +72,7 @@ export default function ContactForm() {
           </div>
           <div className="col-span-12 lg:col-span-10">
             <h3 className="display text-[9vw] md:text-[6vw] lg:text-[88px] font-medium max-w-[16ch]">
-              Tell us what your week<br />
-              <span className="display-italic">is full of.</span>
+              Tell us the most frustrating <span className="display-italic">part of your day.</span>
             </h3>
             <p className="mt-6 max-w-[56ch] text-lg leading-snug opacity-80">
               Four short questions. A real human reads every one. If we&rsquo;re a fit, we&rsquo;ll say so within
@@ -190,7 +189,7 @@ export default function ContactForm() {
                 </button>
                 {status === 'error' && (
                   <span className="mono text-xs text-[color:var(--accent)]">
-                    Something went wrong. Try again or email hello@untrench.work.
+                    Something went wrong. Try again or email hello@nationalailab.us.
                   </span>
                 )}
                 {status === 'idle' && (

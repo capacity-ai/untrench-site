@@ -19,12 +19,11 @@ export default function Hero() {
               <span className="inline-block w-8 h-px bg-current"></span>
               <span>For local and state government</span>
             </div>
-            <h1 className="reveal d2 display text-[14vw] md:text-[10vw] lg:text-[148px] xl:text-[172px] font-semibold">
-              Most AI projects<br />
-              <span className="display-italic-heavy">don&rsquo;t work.</span>
+            <h1 className="reveal d2 display text-[9vw] md:text-[7vw] lg:text-[96px] xl:text-[112px] font-semibold">
+              Most <span className="display-italic">government</span> AI initiatives <span className="display-italic-heavy">don&rsquo;t work.</span>
             </h1>
             <h2 className="reveal d3 display text-[7vw] md:text-[5vw] lg:text-[64px] xl:text-[72px] mt-6 lg:mt-10 max-w-[18ch] font-medium">
-              Ours do, because we do<br />the <span className="accent-mark">unglamorous parts</span>.
+              Ours do, because we do the <span className="accent-mark">unglamorous parts</span>.
             </h2>
           </div>
         </div>
@@ -37,10 +36,16 @@ export default function Hero() {
 
           <div className="col-span-12 lg:col-span-7">
             <p className="reveal d4 text-xl lg:text-2xl leading-snug max-w-[46ch]">
-              <span className="display-italic">Untrench</span> builds agentic systems for cities, counties, and the agencies that serve them.
+              <span className="display-italic">National AI Lab</span> builds agentic systems for cities, counties, and the agencies that serve them.
               We focus on the work where being wrong is <em className="display-italic">expensive.</em>{' '}
               Permits. Grants. RFPs. Code. Constituent mail.
               If a chatbot can handle it, use a chatbot. If it has to be right, that&rsquo;s us.
+            </p>
+            <p className="reveal d5 mt-5 text-base lg:text-lg leading-snug max-w-[46ch] opacity-70">
+              Getting it right means the work most vendors skip: live connections into the systems your staff actually use,
+              retrieval built around how local code is structured rather than which words match,
+              and a test suite running against real permit history before the thing ever sees a reviewer.
+              If you don&rsquo;t know what that last sentence means, that&rsquo;s exactly the point.
             </p>
             <div className="reveal d5 mt-10 flex flex-wrap gap-3">
               <TrackableLink

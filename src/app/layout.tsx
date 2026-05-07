@@ -1,12 +1,11 @@
 import type { Metadata } from 'next';
-import { Fraunces, Inter_Tight, JetBrains_Mono } from 'next/font/google';
+import { Cormorant_Garamond, Inter_Tight, JetBrains_Mono } from 'next/font/google';
 import PostHogProvider from '@/providers/PostHogProvider';
 import './globals.css';
 
-const fraunces = Fraunces({
+const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
-  axes: ['opsz'],
-  weight: 'variable',
+  weight: ['400', '500', '600', '700'],
   style: ['normal', 'italic'],
   variable: '--font-fraunces',
   display: 'swap',
@@ -27,16 +26,16 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Untrench · Agentic systems for local government · by Polco',
+  title: 'National AI Lab · Agentic systems for local government · by Polco',
   description:
-    'Untrench by Polco. Agentic systems for cities, counties, and the agencies that serve them. Built on 30+ years of civic data, for work that has to be right, not 75%.',
+    'National AI Lab by Polco. Agentic systems for cities, counties, and the agencies that serve them. Built on 30+ years of civic data, for work that has to be right, not 75%.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${interTight.variable} ${jetbrainsMono.variable}`}
+      className={`${cormorant.variable} ${interTight.variable} ${jetbrainsMono.variable}`}
     >
       <body>
         <PostHogProvider>{children}</PostHogProvider>

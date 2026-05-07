@@ -2,7 +2,7 @@ export default function FAQ() {
   const items = [
     {
       q: "Why shouldn't we just use ChatGPT for this?",
-      a: "If the work doesn't punish a 25% error rate, please do. ChatGPT is great for that. We're for the work where being wrong is expensive: in council embarrassment, in litigation risk, in records requests, in dollars. And being right requires knowing things a general model doesn't: your code, your prior decisions, your forms, your funders.",
+      a: "If the work doesn't punish a 25% error rate, please do. ChatGPT is great for that. We're for the work where being wrong is expensive — council embarrassment, litigation risk, records requests, real dollars. And getting it right requires knowing things a general model doesn't: your adopted code, your prior decisions, your funders.",
     },
     {
       q: 'How does this fit our procurement?',
@@ -18,7 +18,7 @@ export default function FAQ() {
     },
     {
       q: 'What happens when the underlying models change?',
-      a: "Every system we build comes with an eval suite that runs continuously against your data. When a model update shifts behavior, we see it before you do. That's not a feature; it's the only responsible way to run this kind of software for a public agency.",
+      a: "Every system we build comes with an eval suite that runs continuously against your data. When a model update shifts behavior, we catch it before it reaches a reviewer. That's just responsible practice for software running inside a public agency.",
     },
     {
       q: 'Are you going to tell us we need a chatbot?',
@@ -35,7 +35,7 @@ export default function FAQ() {
           </div>
           <div className="col-span-12 lg:col-span-10">
             <h3 className="display text-[8vw] md:text-[5vw] lg:text-[68px] font-medium">
-              Reasonable<br />questions.
+              Reasonable{/* br-ok */}<br />questions.
             </h3>
           </div>
         </div>

@@ -8,7 +8,7 @@ export default function Approach() {
           </div>
           <div className="col-span-12 lg:col-span-10">
             <h3 className="display text-[8vw] md:text-[5vw] lg:text-[68px] font-medium max-w-[18ch]">
-              There are two kinds of AI work.<br />
+              There are two kinds of AI work.{/* br-ok */}<br />
               <span className="display-italic">We do one of them.</span>
             </h3>
           </div>
@@ -21,7 +21,7 @@ export default function Approach() {
           <div className="col-span-12 md:col-span-6 lg:col-span-5 compare-col">
             <div className="label mb-4 opacity-60">Option A &middot; free, fast, fine</div>
             <h4 className="text-3xl lg:text-4xl mb-6 font-medium">
-              You paste it<br />into a chatbot.
+              You paste it{/* br-ok */}<br />into a chatbot.
             </h4>
             <ul className="space-y-4 text-[17px] leading-relaxed max-w-[40ch]">
               <li className="flex gap-3">
@@ -38,7 +38,7 @@ export default function Approach() {
               </li>
               <li className="flex gap-3">
                 <span className="mono opacity-40 mt-1">&minus;</span>
-                <span className="opacity-70">Doesn&rsquo;t know your municipal code, your funders, your forms, your council.</span>
+                <span className="opacity-70">Knows nothing about your code — and even if you paste it in, it won&rsquo;t know which section governs a corner lot in a historic overlay, or that &sect;23.304 was quietly amended last quarter.</span>
               </li>
               <li className="flex gap-3">
                 <span className="mono opacity-40 mt-1">&minus;</span>
@@ -54,16 +54,16 @@ export default function Approach() {
           <div className="col-span-12 md:col-span-6 lg:col-span-5 compare-col bg-[color:var(--paper-deep)] p-8 lg:p-10 -mx-2 lg:-mx-0">
             <div className="label mb-4 text-[color:var(--accent)]">Option B &middot; what we do</div>
             <h4 className="text-3xl lg:text-4xl mb-6 font-medium">
-              You hire the team that already<br />knows local government.
+              You hire the team that already{/* br-ok */}<br />knows local government.
             </h4>
             <ul className="space-y-4 text-[17px] leading-relaxed max-w-[40ch]">
               <li className="flex gap-3">
                 <span className="mono text-[color:var(--accent)] mt-1">&rarr;</span>
-                <span>Right answers, with citations to <em>your</em> code, <em>your</em> minutes, <em>your</em> ordinances.</span>
+                <span>Right answers, grounded in your actual code, meeting minutes, and adopted ordinances.</span>
               </li>
               <li className="flex gap-3">
                 <span className="mono text-[color:var(--accent)] mt-1">&rarr;</span>
-                <span>Tailored to your jurisdiction, your funders, your prior decisions, your voice.</span>
+                <span>Live integrations into your permit system, GIS, and prior decisions — not a PDF. Retrieval built around how local code is actually structured, not which passages happen to share words with the question.</span>
               </li>
               <li className="flex gap-3">
                 <span className="mono text-[color:var(--accent)] mt-1">&rarr;</span>

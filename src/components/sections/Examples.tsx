@@ -10,7 +10,7 @@ export default function Examples() {
           </div>
           <div className="col-span-12 lg:col-span-10">
             <h3 className="display text-[8vw] md:text-[5vw] lg:text-[68px] font-medium max-w-[20ch]">
-              Five things we&rsquo;ve built<br />
+              Five things we&rsquo;ve built{/* br-ok */}<br />
               <span className="display-italic">for cities like yours.</span>
             </h3>
             <p className="mt-6 max-w-[62ch] text-lg leading-snug opacity-80">
@@ -41,8 +41,9 @@ export default function Examples() {
               <div className="label mb-3">Critique &middot; permitting</div>
               <h4 className="display text-4xl lg:text-5xl font-medium mb-3">Permit review</h4>
               <p className="text-[17px] leading-snug max-w-[42ch] opacity-80">
-                Reads a permit submission against the actual code in force in your jurisdiction.
-                Flags conflicts with citations to your municipal code. Drafts the reviewer&rsquo;s letter.
+                Reads a permit submission against the actual code in force in your jurisdiction —
+                not a generic building code, yours. Knows which sections govern the specific case.
+                Flags conflicts with citations. Drafts the reviewer&rsquo;s letter in your office&rsquo;s voice.
               </p>
               <div className="mt-6 flex items-center gap-2 text-sm font-medium">
                 <span>Try the demo</span>
@@ -88,7 +89,7 @@ export default function Examples() {
               <div className="label mb-3">Search + draft &middot; grants</div>
               <h4 className="display text-4xl lg:text-5xl font-medium mb-3">Grant finder &amp; writer</h4>
               <p className="text-[17px] leading-snug max-w-[42ch] opacity-80">
-                Reads your city&rsquo;s capital plan and prior awards. Surfaces federal, state, and foundation grants you actually qualify for, with fit reasoning, then drafts the narrative in your voice, not in AI voice.
+                Reads your capital plan and prior awards, then matches them against live federal, state, and foundation grant databases — including the eligibility rules most searches miss. Fit scores with reasoning. Drafts the narrative in your voice.
               </p>
               <div className="mt-6 flex items-center gap-2 text-sm font-medium opacity-70">
                 <span>Coming soon</span>

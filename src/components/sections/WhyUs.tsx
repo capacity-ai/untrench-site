@@ -8,7 +8,7 @@ export default function WhyUs() {
           </div>
           <div className="col-span-12 lg:col-span-10">
             <h3 className="display text-[8vw] md:text-[5vw] lg:text-[68px] font-medium max-w-[20ch]">
-              We knew we<br />
+              We knew we{/* br-ok */}<br />
               <span className="display-italic">had to build this.</span>
             </h3>
           </div>
@@ -23,17 +23,21 @@ export default function WhyUs() {
               That&rsquo;s our day job, and we&rsquo;re good at it.
             </p>
             <p>
-              We didn&rsquo;t set out to build agentic AI products. We started <span className="display-italic">Untrench</span>{' '}
+              We didn&rsquo;t set out to build agentic AI products. We started <span className="display-italic">National AI Lab</span>{' '}
               because we kept watching the same thing happen: vendors selling local governments expensive, brittle
               &ldquo;AI solutions&rdquo; that hallucinate code citations, ignore the actual jurisdiction,
               and produce work nobody on staff would sign their name to.
               Cities deserve better than that. We knew we were the right people to build it.
             </p>
             <p>
-              The name is the promise. Cities don&rsquo;t have a time problem. They have a <em className="display-italic">capacity</em> problem.
+              Cities don&rsquo;t have a time problem. They have a <em className="display-italic">capacity</em> problem.
               Too few staff, too much work, no room to do anything new. We give that capacity back, built on
-              <em> your</em> codes, your prior decisions, your funders, your voice, and the institutional knowledge
-              we&rsquo;ve earned across a thousand civic relationships.
+              your actual code, your prior decisions, your funding sources, and the institutional knowledge
+              we&rsquo;ve earned across a thousand civic relationships. Making that reliable at the specificity
+              local government actually requires — knowing which part of the code governs each case,
+              connecting into the systems your staff already use, proving it&rsquo;s right before a reviewer stakes
+              their name on it — is harder than it looks. That&rsquo;s the work we&rsquo;ve spent the last year
+              learning to do right.
             </p>
           </div>
 

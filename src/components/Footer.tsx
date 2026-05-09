@@ -28,7 +28,7 @@ export default function Footer() {
           <div className="col-span-6 lg:col-span-3">
             <div className="label mb-3 opacity-60">Elsewhere</div>
             <ul className="space-y-1.5 text-sm">
-              <li><a href="mailto:hello@untrench.work" className="hover:text-[color:var(--accent)]">hello@untrench.work</a></li>
+              <li><a href="mailto:hello@nationalailab.com" className="hover:text-[color:var(--accent)]">hello@nationalailab.com</a></li>
               <li><a href="https://polco.us" target="_blank" rel="noopener noreferrer" className="hover:text-[color:var(--accent)]">polco.us</a></li>
               <li><a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-[color:var(--accent)]">LinkedIn</a></li>
             </ul>

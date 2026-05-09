@@ -190,7 +190,7 @@ export default function ContactForm() {
                 </button>
                 {status === 'error' && (
                   <span className="mono text-xs text-[color:var(--accent)]">
-                    Something went wrong. Try again or email hello@untrench.work.
+                    Something went wrong. Try again or email hello@nationalailab.com.
                   </span>
                 )}
                 {status === 'idle' && (

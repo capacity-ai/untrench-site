@@ -2,8 +2,8 @@ import TrackableLink from '@/components/TrackableLink';
 
 export default function Hero() {
   return (
-    <section className="relative z-10 border-b hairline">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-10 pt-20 pb-24 lg:pt-28 lg:pb-32">
+    <section className="relative z-10 border-b hairline bg-[color:var(--paper)]">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-10 pt-24 pb-28 lg:pt-32 lg:pb-40">
         <div className="grid grid-cols-12 gap-6 lg:gap-10">
           {/* Left rail */}
           <div className="col-span-12 lg:col-span-2">
@@ -20,7 +20,8 @@ export default function Hero() {
               <span>For local and state government</span>
             </div>
             <h1 className="reveal d2 display text-[14vw] md:text-[10vw] lg:text-[148px] xl:text-[172px] font-semibold">
-              Most AI projects<br />
+              Most local government<br />
+              AI projects<br />
               <span className="display-italic-heavy">don&rsquo;t work.</span>
             </h1>
             <h2 className="reveal d3 display text-[7vw] md:text-[5vw] lg:text-[64px] xl:text-[72px] mt-6 lg:mt-10 max-w-[18ch] font-medium">
@@ -37,7 +38,7 @@ export default function Hero() {
 
           <div className="col-span-12 lg:col-span-7">
             <p className="reveal d4 text-xl lg:text-2xl leading-snug max-w-[46ch]">
-              <span className="display-italic">Untrench</span> builds agentic systems for cities, counties, and the agencies that serve them.
+              We build agentic systems for cities, counties, and the agencies that serve them.
               We focus on the work where being wrong is <em className="display-italic">expensive.</em>{' '}
               Permits. Grants. RFPs. Code. Constituent mail.
               If a chatbot can handle it, use a chatbot. If it has to be right, that&rsquo;s us.

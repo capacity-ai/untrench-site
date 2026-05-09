@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import PermitReviewDemo from '@/components/demos/PermitReviewDemo';
+import { NailMark } from '@/components/NailMark';
 
 export const metadata: Metadata = {
-  title: 'Permit Review Demo &middot; Untrench',
+  title: 'Permit Review Demo · National AI Lab',
   description:
-    'Watch the Untrench permit review agent read a submittal, cross-reference the code in force, and draft the reviewer\'s letter — in real time.',
+    'Watch the National AI Lab permit review agent read a submittal, cross-reference the code in force, and draft the reviewer\'s letter — in real time.',
 };
 
 export default function PermitReviewPage() {
@@ -16,14 +17,9 @@ export default function PermitReviewPage() {
         <div className="max-w-[1600px] mx-auto px-6 lg:px-8 h-14 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-3">
-              <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
-                <rect x="1" y="1" width="9" height="9" stroke="currentColor" strokeWidth="1.4" />
-                <rect x="12" y="1" width="9" height="9" stroke="currentColor" strokeWidth="1.4" />
-                <rect x="1" y="12" width="9" height="9" stroke="currentColor" strokeWidth="1.4" />
-                <rect x="12" y="12" width="9" height="9" fill="currentColor" />
-              </svg>
+              <NailMark size={18} />
               <span className="display text-[18px] font-semibold">
-                Untrench
+                National AI Lab
               </span>
               <span className="hidden sm:inline-block mono text-[10px] uppercase tracking-[0.16em] opacity-60 border-l hairline pl-3">
                 by Polco

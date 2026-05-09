@@ -1,18 +1,14 @@
 import Link from 'next/link';
 import TrackableLink from './TrackableLink';
+import { NailMark } from './NailMark';
 
 export default function Nav() {
   return (
-    <header className="relative z-10 border-b hairline">
+    <header className="relative z-10 border-b hairline bg-[color:var(--paper)]">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-            <rect x="1" y="1" width="9" height="9" stroke="currentColor" strokeWidth="1.4" />
-            <rect x="12" y="1" width="9" height="9" stroke="currentColor" strokeWidth="1.4" />
-            <rect x="1" y="12" width="9" height="9" stroke="currentColor" strokeWidth="1.4" />
-            <rect x="12" y="12" width="9" height="9" fill="currentColor" />
-          </svg>
-          <span className="display text-[22px] font-semibold tracking-tight">Untrench</span>
+          <NailMark size={22} />
+          <span className="display text-[22px] font-semibold tracking-tight">National AI Lab</span>
           <span className="hidden sm:inline-block mono text-[10px] uppercase tracking-[0.16em] opacity-60 border-l hairline pl-3">
             by Polco
           </span>

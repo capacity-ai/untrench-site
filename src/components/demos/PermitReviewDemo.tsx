@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { SCENARIOS, ScenarioKey, Issue } from '@/lib/permit-scenarios';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import Link from 'next/link';
+import { SCENARIOS, ScenarioKey, Issue, ChatMessage } from '@/lib/permit-scenarios';
 import { captureDemoStarted, captureDemoCompleted } from '@/lib/posthog';
 
 interface StepState {
@@ -18,17 +19,178 @@ const SCENARIO_LABELS: Record<ScenarioKey, { label: string; letter: string; time
   solar: { label: 'Rooftop solar, SFR', letter: 'C', time: '~30 sec' },
 };
 
+// ─── App window chrome ────────────────────────────────────────────────────────
+
+function AppWindow({
+  permitId,
+  phase,
+  onReset,
+  children,
+}: {
+  permitId: string | null;
+  phase: Phase;
+  onReset: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className="rounded-xl overflow-hidden border hairline"
+      style={{ boxShadow: '0 24px 64px rgba(21,19,15,0.18), 0 2px 8px rgba(21,19,15,0.08)' }}
+    >
+      {/* Title bar */}
+      <div
+        className="flex items-center px-4 py-2.5 border-b hairline select-none"
+        style={{ background: 'var(--paper-deeper)' }}
+      >
+        {/* Traffic lights */}
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <div className="w-3 h-3 rounded-full" style={{ background: '#ff5f57' }} />
+          <div className="w-3 h-3 rounded-full" style={{ background: '#febc2e' }} />
+          <div className="w-3 h-3 rounded-full" style={{ background: '#28c840' }} />
+        </div>
+        {/* Title */}
+        <div className="flex-1 text-center">
+          <span className="text-[12px] font-medium opacity-50">
+            Untrench &middot; Permit Review
+            {permitId && (
+              <span className="opacity-70"> &mdash; {permitId}</span>
+            )}
+          </span>
+        </div>
+        {/* Status / action */}
+        <div className="flex-shrink-0 flex items-center gap-3">
+          {phase === 'running' && (
+            <span className="status-pill" style={{ fontSize: '9px' }}>
+              <span className="live-dot" /> Working
+            </span>
+          )}
+          {phase === 'complete' && (
+            <span className="status-pill" style={{ fontSize: '9px', borderColor: 'var(--green)', color: 'var(--green)' }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--green)', display: 'inline-block' }} />
+              Complete
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Toolbar / breadcrumb */}
+      <div
+        className="flex items-center gap-2 px-4 py-1.5 border-b hairline text-[11px]"
+        style={{ background: 'var(--paper-deep)' }}
+      >
+        <span className="opacity-40 cursor-default">Review Queue</span>
+        {permitId && (
+          <>
+            <span className="opacity-25">›</span>
+            <span className="mono opacity-60 text-[10px]">{permitId}</span>
+          </>
+        )}
+        {phase !== 'picking' && (
+          <button
+            onClick={onReset}
+            className="opacity-40 hover:opacity-80 transition-opacity text-[10px] mono"
+          >
+            ← change
+          </button>
+        )}
+        <div className="ml-auto mono text-[10px] opacity-30">
+          {phase === 'picking' ? 'Select a submittal to begin' : ''}
+        </div>
+      </div>
+
+      {/* Content */}
+      {children}
+    </div>
+  );
+}
+
+// ─── Confetti ─────────────────────────────────────────────────────────────────
+
+function Confetti() {
+  const pieces = useMemo(() =>
+    Array.from({ length: 80 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      delay: Math.random() * 1.4,
+      duration: 2.2 + Math.random() * 2,
+      color: ['#b8351a', '#febc2e', '#28c840', '#1e3a6e', '#c98a1a', '#f4d4be', '#15130f'][Math.floor(Math.random() * 7)],
+      size: 5 + Math.random() * 9,
+      rotation: Math.random() * 360,
+      circle: Math.random() > 0.55,
+    })),
+    []
+  );
+
+  return (
+    <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 9999 }}>
+      {pieces.map(p => (
+        <div
+          key={p.id}
+          style={{
+            position: 'absolute',
+            left: `${p.x}%`,
+            top: -16,
+            width: p.size,
+            height: p.size,
+            background: p.color,
+            borderRadius: p.circle ? '50%' : 2,
+            animation: `confettiFall ${p.duration}s ${p.delay}s ease-in forwards`,
+            transform: `rotate(${p.rotation}deg)`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// ─── Issue card ───────────────────────────────────────────────────────────────
+
+function IssueCard({ issue }: { issue: Issue }) {
+  const sevLabel = {
+    high: <span className="mono text-[10px] uppercase tracking-wider" style={{ color: 'var(--accent)' }}>High &middot; correction required</span>,
+    medium: <span className="mono text-[10px] uppercase tracking-wider" style={{ color: '#c98a1a' }}>Medium &middot; clarification needed</span>,
+    info: <span className="mono text-[10px] uppercase tracking-wider opacity-60">Info &middot; no action</span>,
+  }[issue.severity];
+
+  return (
+    <div className={`issue-card severity-${issue.severity} p-4`}>
+      <div className="flex items-start justify-between gap-3 mb-2">
+        <div>
+          <div className="label opacity-60 mb-1">{issue.category}</div>
+          <div className="font-medium text-[15px]">{issue.title}</div>
+        </div>
+        {sevLabel}
+      </div>
+      <div
+        className="text-sm leading-relaxed mb-2"
+        dangerouslySetInnerHTML={{ __html: issue.body }}
+      />
+      <div className="text-xs flex items-center gap-2 opacity-70">
+        <span className="chip">{issue.cite}</span>
+      </div>
+      {issue.suggested && (
+        <div className="mt-3 pt-3 border-t hairline text-sm leading-relaxed">
+          <span className="label opacity-60">Suggested resolution &middot;</span> {issue.suggested}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
+
 export default function PermitReviewDemo() {
   const [selectedKey, setSelectedKey] = useState<ScenarioKey | null>(null);
   const [phase, setPhase] = useState<Phase>('picking');
   const [steps, setSteps] = useState<StepState[]>([]);
   const [issues, setIssues] = useState<Issue[]>([]);
+  const [chatMsgs, setChatMsgs] = useState<{ text: string }[]>([]);
   const [letterVisible, setLetterVisible] = useState(false);
   const [readPct, setReadPct] = useState(0);
+  const [emailSent, setEmailSent] = useState(false);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const startTimeRef = useRef<number>(0);
   const reasoningRef = useRef<HTMLDivElement>(null);
-  const letterRef = useRef<HTMLDivElement>(null);
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach(clearTimeout);
@@ -43,17 +205,14 @@ export default function PermitReviewDemo() {
     }
   }, [steps]);
 
-  useEffect(() => {
-    if (letterVisible && letterRef.current) {
-      setTimeout(() => letterRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
-    }
-  }, [letterVisible]);
+  // Letter appears naturally as page grows — no forced scroll
 
   function runScenario(key: ScenarioKey) {
     const scenario = SCENARIOS[key];
     clearTimers();
     setSteps([]);
     setIssues([]);
+    setChatMsgs([]);
     setLetterVisible(false);
     setReadPct(0);
     setPhase('running');
@@ -89,6 +248,11 @@ export default function PermitReviewDemo() {
       newTimers.push(t);
     });
 
+    scenario.chatMessages.forEach((msg: ChatMessage) => {
+      const t = setTimeout(() => setChatMsgs(prev => [...prev, { text: msg.text }]), msg.ms);
+      newTimers.push(t);
+    });
+
     timersRef.current = newTimers;
   }
 
@@ -98,68 +262,41 @@ export default function PermitReviewDemo() {
     setPhase('picking');
     setSteps([]);
     setIssues([]);
+    setChatMsgs([]);
     setLetterVisible(false);
     setReadPct(0);
+    setEmailSent(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   const scenario = selectedKey ? SCENARIOS[selectedKey] : null;
-  const isWorking = phase === 'running' || phase === 'complete';
+  const isWorking = phase === 'running';
+  const isActive = phase === 'running' || phase === 'complete';
+
+  // Extract permit ID from docTitle for the window title bar
+  const permitId = scenario ? scenario.docTitle.split(' ')[0].replace('&middot;', '').trim() : null;
 
   return (
-    <>
-      {/* Doc context subheader */}
-      {isWorking && scenario && (
-        <div className="relative z-10 border-b hairline bg-[color:var(--paper-deep)]">
-          <div className="max-w-[1600px] mx-auto px-6 lg:px-8 py-3 flex items-center justify-between flex-wrap gap-3">
-            <div className="flex items-center gap-6 flex-wrap">
-              <div>
-                <div className="label opacity-60">Reviewing</div>
-                <div
-                  className="text-sm font-medium"
-                  dangerouslySetInnerHTML={{ __html: scenario.docTitle }}
-                />
-              </div>
-              <div>
-                <div className="label opacity-60">Jurisdiction</div>
-                <div className="text-sm font-medium">{scenario.juris}</div>
-              </div>
-              <div>
-                <div className="label opacity-60">Code in force</div>
-                <div className="text-sm mono">{scenario.code}</div>
-              </div>
-              <div>
-                <div className="label opacity-60">Reviewer</div>
-                <div className="text-sm">{scenario.reviewer}</div>
-              </div>
-            </div>
-            <button onClick={handleReset} className="btn-ghost text-xs px-3 py-1.5">
-              &larr; Pick a different scenario
-            </button>
-          </div>
-        </div>
-      )}
+    <main className="relative z-10 px-4 lg:px-6 py-6 lg:py-8">
+      <AppWindow permitId={permitId} phase={phase} onReset={handleReset}>
 
-      {/* Main */}
-      <main className="relative z-10 max-w-[1600px] mx-auto px-6 lg:px-8 py-8 lg:py-10">
-
-        {/* Picker */}
+        {/* ── Picker ── */}
         {phase === 'picking' && (
-          <section>
+          <div className="p-6 lg:p-8">
             <div className="mb-8">
               <div className="label mb-3 opacity-70">Step 1 of 2</div>
-              <h1 className="display text-4xl lg:text-6xl font-medium leading-[0.95] mb-4 max-w-[20ch]">
+              <h1 className="display text-4xl lg:text-5xl font-medium leading-[0.95] mb-4 max-w-[22ch]">
                 Pick a permit submittal.<br />
                 <span className="display-italic">Watch us review it.</span>
               </h1>
-              <p className="text-lg leading-snug opacity-80 max-w-[60ch]">
+              <p className="text-base leading-snug opacity-80 max-w-[60ch]">
                 Each scenario is real building-code review work, sized to a small or mid-size jurisdiction.
-                The agent reads the submittal, cross-references the actual code in force, and produces a reviewer&rsquo;s letter
-                with citations. Pick one to start.
+                The agent reads the submittal, cross-references the code in force, and produces a
+                reviewer&rsquo;s letter with citations.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-5">
+            <div className="grid md:grid-cols-3 gap-4">
               {(Object.entries(SCENARIOS) as [ScenarioKey, (typeof SCENARIOS)[ScenarioKey]][]).map(([key, s]) => {
                 const meta = SCENARIO_LABELS[key];
                 return (
@@ -174,9 +311,9 @@ export default function PermitReviewDemo() {
                     </div>
                     <div className="display text-2xl font-medium mb-2 leading-tight">{meta.label}</div>
                     <div className="text-sm opacity-80 mb-4 leading-snug">
-                      {key === 'adu' && '720 sq ft detached accessory dwelling unit on a single-family lot. Submitted by a local design-build firm.'}
-                      {key === 'cafe' && 'Conversion of vacant retail bay into a 38-seat cafe with limited prep kitchen. Existing 1986 strip mall.'}
-                      {key === 'solar' && '8.4 kW residential rooftop PV array, 22 modules on a 1990s composition-shingle roof. Standard installer package.'}
+                      {key === 'adu' && '720 sq ft detached ADU on a single-family lot. Submitted by a local design-build firm.'}
+                      {key === 'cafe' && 'Conversion of vacant retail bay into a 38-seat cafe. Existing 1986 strip mall, use change M to A-2.'}
+                      {key === 'solar' && '8.4 kW residential rooftop PV array, 22 modules on a 1990s composition-shingle roof.'}
                     </div>
                     <div className="space-y-1.5 text-xs opacity-70">
                       <div className="flex justify-between"><span>Jurisdiction</span><span className="mono">{s.juris.split(' (')[0]}</span></div>
@@ -194,7 +331,7 @@ export default function PermitReviewDemo() {
               })}
             </div>
 
-            <div className="mt-8 flex items-center gap-3">
+            <div className="mt-6 flex items-center gap-3">
               <button
                 className="btn-primary px-6 py-3 text-sm"
                 disabled={!selectedKey}
@@ -206,41 +343,53 @@ export default function PermitReviewDemo() {
                 {selectedKey ? `Selected: ${SCENARIO_LABELS[selectedKey].label}` : 'Pick a scenario above.'}
               </span>
             </div>
-          </section>
+          </div>
         )}
 
-        {/* Workspace */}
-        {isWorking && scenario && (
-          <section>
-            <div className="grid grid-cols-12 gap-6">
-
-              {/* Left: document preview */}
-              <aside className="col-span-12 lg:col-span-3">
-                <div className="label mb-3 opacity-60">Submittal</div>
+        {/* ── Workspace ── */}
+        {isActive && scenario && (
+          <div
+            className="grid"
+            style={{ gridTemplateColumns: '280px 1fr 300px' }}
+          >
+            {/* Left: Submittal form — grows with content, page scrolls */}
+            <aside
+              className="border-r hairline"
+              style={{ background: 'var(--paper)' }}
+            >
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="label opacity-60" style={{ fontSize: '10px' }}>Submittal</div>
+                  <span className="mono text-[9px] opacity-50">
+                    Sheet 1/{scenario.pages} &middot; <span className="num">{readPct}</span>% read
+                  </span>
+                </div>
                 <div
-                  className="doc-preview p-5 text-[13px] leading-[24px]"
+                  className="doc-preview p-4 text-[12px]"
                   dangerouslySetInnerHTML={{ __html: scenario.docContent }}
                 />
-                <div className="mt-3 mono text-[11px] opacity-60 flex items-center justify-between">
-                  <span>Sheet 1 of <span className="num">{scenario.pages}</span></span>
-                  <span>Read by agent &middot; <span className="num">{readPct}</span>%</span>
-                </div>
-              </aside>
+              </div>
+            </aside>
 
-              {/* Center: findings */}
-              <div className="col-span-12 lg:col-span-6">
-                <div className="flex items-center justify-between mb-3">
+            {/* Center: Findings + letter — grows with content, page scrolls */}
+            <div
+              className="border-r hairline"
+              style={{ background: 'var(--paper)' }}
+            >
+              <div className="p-5">
+                {/* Findings header */}
+                <div className="flex items-center justify-between mb-4">
                   <div className="label opacity-60">Findings</div>
                   <div className="flex items-center gap-3 mono text-[11px] opacity-70">
                     <span><span className="num">{issues.length}</span> issue(s)</span>
-                    <span className="opacity-50">&bull;</span>
+                    <span className="opacity-40">&bull;</span>
                     <span><span className="num">{issues.length}</span> citation(s)</span>
                   </div>
                 </div>
 
-                <div className="space-y-3 min-h-[300px]">
+                <div className="space-y-3 min-h-[200px]">
                   {issues.length === 0 && (
-                    <div className="text-sm opacity-50 italic py-12 text-center">
+                    <div className="text-sm opacity-40 italic py-12 text-center">
                       Findings will appear here as the agent works.
                     </div>
                   )}
@@ -249,13 +398,13 @@ export default function PermitReviewDemo() {
                   ))}
                 </div>
 
-                {/* Letter */}
+                {/* Reviewer letter */}
                 {letterVisible && (
-                  <div ref={letterRef} className="mt-8">
+                  <div className="mt-8">
                     <div className="flex items-center justify-between mb-3">
                       <div className="label opacity-60">Draft &middot; reviewer&rsquo;s letter</div>
                       <span className="status-pill" style={{ borderColor: 'var(--green)', color: 'var(--green)' }}>
-                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--green)', display: 'inline-block' }}></span>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--green)', display: 'inline-block' }} />
                         Ready for human review
                       </span>
                     </div>
@@ -269,92 +418,138 @@ export default function PermitReviewDemo() {
                       </div>
                       <div dangerouslySetInnerHTML={{ __html: scenario.letter.body }} />
                     </div>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <button className="btn-ghost px-4 py-2 text-xs">Open in editor</button>
-                      <button className="btn-ghost px-4 py-2 text-xs">Send to applicant queue</button>
-                      <button className="btn-ghost px-4 py-2 text-xs">Export PDF</button>
-                      <button onClick={handleReset} className="btn-primary px-4 py-2 text-xs ml-auto">
-                        Try another scenario <span className="caret">&rarr;</span>
-                      </button>
-                    </div>
+                    {emailSent ? (
+                      <>
+                        <Confetti />
+                        <div className="mt-6 p-8 border hairline text-center" style={{ background: 'var(--paper-deep)' }}>
+                          <div className="display text-5xl font-medium mb-3 leading-tight">
+                            That was<br /><span className="display-italic">easy.</span>
+                          </div>
+                          <p className="text-sm opacity-60 mb-7 max-w-[36ch] mx-auto leading-relaxed">
+                            Email queued for the applicant. {scenario.reviewer.split(' (')[0]} has been notified.
+                          </p>
+                          <div className="flex items-center justify-center gap-3 flex-wrap">
+                            <button onClick={handleReset} className="btn-primary px-6 py-3 text-sm">
+                              Try another scenario <span className="caret">&rarr;</span>
+                            </button>
+                            <Link href="/#contact" className="btn-ghost px-6 py-3 text-sm">
+                              Talk to us <span className="caret">&rarr;</span>
+                            </Link>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="mt-4 flex items-center gap-3 flex-wrap">
+                        <button
+                          className="btn-primary px-4 py-2 text-xs"
+                          onClick={() => setEmailSent(true)}
+                        >
+                          Send as an email to applicant <span className="caret">&rarr;</span>
+                        </button>
+                        <button onClick={handleReset} className="btn-ghost px-4 py-2 text-xs">
+                          Try another scenario
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
+            </div>
 
-              {/* Right: reasoning trail */}
-              <aside className="col-span-12 lg:col-span-3">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="label opacity-60">Agent reasoning</div>
-                  {phase === 'complete' ? (
-                    <span className="status-pill" style={{ borderColor: 'var(--green)', color: 'var(--green)' }}>
-                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--green)', display: 'inline-block' }}></span>
-                      Complete
-                    </span>
+            {/* Right: Chat + Reasoning — natural flow, each panel has its own bounded scroll */}
+            <aside style={{ background: 'var(--paper-deep)' }}>
+              {/* Chat panel */}
+              <div className="p-4 border-b hairline">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="label opacity-60" style={{ fontSize: '10px' }}>Agent</div>
+                  <span className="mono text-[9px] opacity-40">{scenario.reviewer.split(' (')[0]}</span>
+                </div>
+                <div className="max-h-72 overflow-y-auto scroll-area space-y-2 pr-0.5">
+                  {chatMsgs.length === 0 ? (
+                    <div className="text-[11px] opacity-30 italic py-8 text-center leading-relaxed">
+                      Agent will narrate<br />findings as it works.
+                    </div>
                   ) : (
-                    <span className="status-pill">
-                      <span className="live-dot"></span> Working
-                    </span>
+                    chatMsgs.map((msg, i) => (
+                      <div key={i} className="flex gap-2 items-start">
+                        <div
+                          className="flex-shrink-0 w-[18px] h-[18px] rounded flex items-center justify-center text-[7px] font-bold mt-0.5 leading-none"
+                          style={{ background: 'var(--accent)', color: 'var(--paper)', letterSpacing: '0.04em' }}
+                        >
+                          AI
+                        </div>
+                        <div
+                          className="text-[11.5px] leading-snug rounded px-2 py-1.5 flex-1"
+                          style={{ background: 'var(--paper)', border: '1px solid var(--rule)' }}
+                        >
+                          {msg.text}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                  {isWorking && (
+                    <div className="flex gap-2 items-start">
+                      <div
+                        className="flex-shrink-0 w-[18px] h-[18px] rounded flex items-center justify-center text-[7px] font-bold"
+                        style={{ background: 'var(--accent)', color: 'var(--paper)' }}
+                      >
+                        AI
+                      </div>
+                      <div
+                        className="text-[13px] rounded px-2.5 py-1"
+                        style={{ background: 'var(--paper)', border: '1px solid var(--rule)', letterSpacing: '0.1em' }}
+                      >
+                        <span className="opacity-30 animate-pulse">· · ·</span>
+                      </div>
+                    </div>
                   )}
                 </div>
-                <div ref={reasoningRef} className="scroll-area space-y-3 max-h-[600px] overflow-y-auto pr-2">
+                {/* Disabled input */}
+                <div className="mt-2 pt-2 border-t hairline flex gap-1.5 items-center">
+                  <input
+                    type="text"
+                    disabled
+                    placeholder={isWorking ? 'Review in progress…' : 'Demo mode — input disabled'}
+                    className="flex-1 text-[10.5px] px-2 py-1 border hairline rounded opacity-30 cursor-not-allowed bg-transparent"
+                  />
+                  <button disabled className="text-[10.5px] px-2 py-1 border hairline rounded opacity-20 cursor-not-allowed whitespace-nowrap">
+                    Send
+                  </button>
+                </div>
+              </div>
+
+              {/* Reasoning trail */}
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="label opacity-40" style={{ fontSize: '9px' }}>Internal reasoning</div>
+                  {phase === 'complete' ? (
+                    <span className="mono text-[9px]" style={{ color: 'var(--green)' }}>done</span>
+                  ) : (
+                    <span className="mono text-[9px] opacity-40">live</span>
+                  )}
+                </div>
+                <div ref={reasoningRef} className="max-h-56 overflow-y-auto scroll-area space-y-2">
+                  {steps.length === 0 && (
+                    <div className="text-[10px] opacity-25 italic py-4 text-center">
+                      Steps will appear here.
+                    </div>
+                  )}
                   {steps.map((step, i) => (
-                    <div key={i} className="step flex gap-3 text-[12.5px] leading-snug">
-                      <div className={`step-icon ${step.status}`}></div>
+                    <div key={i} className="step flex gap-2 text-[11px] leading-snug">
+                      <div className={`step-icon ${step.status}`} style={{ width: 14, height: 14, marginTop: 2 }} />
                       <div className="flex-1 min-w-0">
-                        <div
-                          className="font-medium"
-                          dangerouslySetInnerHTML={{ __html: step.text }}
-                        />
-                        <div
-                          className="opacity-60 text-[11px] mt-0.5 leading-snug mono"
-                          dangerouslySetInnerHTML={{ __html: step.detail }}
-                        />
+                        <div className="font-medium text-[10.5px]" dangerouslySetInnerHTML={{ __html: step.text }} />
+                        <div className="opacity-50 text-[9.5px] mt-0.5 leading-snug mono" dangerouslySetInnerHTML={{ __html: step.detail }} />
                       </div>
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 p-3 border hairline text-xs opacity-70 leading-relaxed">
-                  <div className="mono text-[10px] uppercase tracking-wider opacity-60 mb-1">What you&rsquo;re seeing</div>
-                  In production, this stream is real model reasoning, not a script. Every step is logged and
-                  attributable. Reviewers can drill into any citation to see the source paragraph.
-                </div>
-              </aside>
-            </div>
-          </section>
+              </div>
+            </aside>
+          </div>
         )}
-      </main>
-    </>
-  );
-}
 
-function IssueCard({ issue }: { issue: Issue }) {
-  const sevLabel = {
-    high: <span className="mono text-[10px] uppercase tracking-wider" style={{ color: 'var(--accent)' }}>High &middot; correction required</span>,
-    medium: <span className="mono text-[10px] uppercase tracking-wider" style={{ color: '#c98a1a' }}>Medium &middot; clarification needed</span>,
-    info: <span className="mono text-[10px] uppercase tracking-wider opacity-60">Info &middot; no action</span>,
-  }[issue.severity];
-
-  return (
-    <div className={`issue-card severity-${issue.severity} p-4`}>
-      <div className="flex items-start justify-between gap-3 mb-2">
-        <div>
-          <div className="label opacity-60 mb-1">{issue.category}</div>
-          <div className="font-medium text-[15px]">{issue.title}</div>
-        </div>
-        {sevLabel}
-      </div>
-      <div
-        className="text-sm leading-relaxed mb-2"
-        dangerouslySetInnerHTML={{ __html: issue.body }}
-      />
-      <div className="text-xs flex items-center gap-2 opacity-70">
-        <span className="chip">{issue.cite}</span>
-      </div>
-      {issue.suggested && (
-        <div className="mt-3 pt-3 border-t hairline text-sm leading-relaxed">
-          <span className="label opacity-60">Suggested resolution &middot;</span> {issue.suggested}
-        </div>
-      )}
-    </div>
+      </AppWindow>
+    </main>
   );
 }

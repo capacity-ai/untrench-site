@@ -4,11 +4,16 @@
 
 :root {
   --ink: #15130f;
-  --paper: #f1ece0;
-  --paper-deep: #e7e0cd;
+  --ink-soft: #5A5853;
+  --ink-mute: #8A857B;
+  --paper: #EFE9DD;
+  --paper-deep: #E5DFD0;
   --paper-deeper: #d9d0b5;
-  --accent: #b8351a;
-  --accent-soft: #f4d4be;
+  --surface: #FFFFFF;
+  --accent: #5E7434;
+  --accent-soft: rgba(94, 116, 52, 0.15);
+  --polco: #9BB463;
+  --polco-deep: #5E7434;
   --green: #2d6a4f;
   --rule: rgba(21, 19, 15, 0.18);
 }
@@ -16,7 +21,7 @@
 * { -webkit-font-smoothing: antialiased; }
 html { scroll-behavior: smooth; }
 body {
-  background: var(--paper);
+  background: var(--surface);
   color: var(--ink);
   font-family: var(--font-inter-tight), system-ui, sans-serif;
   font-feature-settings: 'ss01', 'cv11';
@@ -33,6 +38,13 @@ body {
   font-family: var(--font-fraunces), serif;
   font-style: italic;
   font-variation-settings: 'opsz' 144;
+}
+/* Inline italic for body text — uses body-size optical axis, not display size */
+.body-italic {
+  font-family: var(--font-fraunces), serif;
+  font-style: italic;
+  font-variation-settings: 'opsz' 14;
+  font-size: inherit;
 }
 .display-italic-heavy {
   font-family: var(--font-fraunces), serif;
@@ -77,6 +89,19 @@ body::before {
   to { transform: translateX(-50%); }
 }
 
+/* Customer logo banner */
+.logo-item {
+  height: 36px;
+  width: auto;
+  max-width: 120px;
+  object-fit: contain;
+  filter: grayscale(1) brightness(0.08);
+  opacity: 0.55;
+  flex-shrink: 0;
+  transition: opacity 0.2s ease;
+}
+.logo-item:hover { opacity: 0.85; }
+
 /* Reveal on load */
 .reveal { opacity: 0; transform: translateY(10px); animation: reveal 1s cubic-bezier(0.2, 0.6, 0.2, 1) forwards; }
 @keyframes reveal { to { opacity: 1; transform: translateY(0); } }
@@ -112,20 +137,20 @@ body::before {
 
 /* Buttons */
 .btn-primary {
-  background: var(--ink);
-  color: var(--paper);
-  border: 1px solid var(--ink);
+  background: var(--polco-deep);
+  color: #fff;
+  border: 1px solid var(--polco-deep);
   transition: all 0.2s ease;
 }
-.btn-primary:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); }
+.btn-primary:hover:not(:disabled) { background: var(--polco); border-color: var(--polco); }
 .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
 .btn-ghost {
   background: transparent;
-  color: var(--ink);
-  border: 1px solid var(--ink);
+  color: var(--polco-deep);
+  border: 1px solid var(--polco-deep);
   transition: all 0.2s ease;
 }
-.btn-ghost:hover { background: var(--ink); color: var(--paper); }
+.btn-ghost:hover { background: var(--polco-deep); color: #fff; }
 
 /* Pill / tag */
 .pill {
@@ -185,8 +210,8 @@ body::before {
   animation: pulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 @keyframes pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(184, 53, 26, 0.5); }
-  50% { box-shadow: 0 0 0 10px rgba(184, 53, 26, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(94, 116, 52, 0.5); }
+  50% { box-shadow: 0 0 0 10px rgba(94, 116, 52, 0); }
 }
 
 /* Accordion */
@@ -259,8 +284,8 @@ a:hover .caret, button:hover .caret { transform: translateX(3px); }
   animation: pulse-ring 1.4s ease-in-out infinite;
 }
 @keyframes pulse-ring {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(184,53,26,0.6); }
-  50% { box-shadow: 0 0 0 6px rgba(184,53,26,0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(94,116,52,0.6); }
+  50% { box-shadow: 0 0 0 6px rgba(94,116,52,0); }
 }
 
 /* Issue card */
@@ -309,8 +334,8 @@ a:hover .caret, button:hover .caret { transform: translateX(3px); }
   animation: live 1.6s ease-in-out infinite;
 }
 @keyframes live {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(184,53,26,0.6); }
-  50% { box-shadow: 0 0 0 5px rgba(184,53,26,0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(94,116,52,0.6); }
+  50% { box-shadow: 0 0 0 5px rgba(94,116,52,0); }
 }
 
 /* Status pill */

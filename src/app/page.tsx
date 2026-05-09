@@ -1,5 +1,6 @@
 import Nav from '@/components/Nav';
 import Hero from '@/components/sections/Hero';
+import CustomerLogos from '@/components/sections/CustomerLogos';
 import Approach from '@/components/sections/Approach';
 import WhyUs from '@/components/sections/WhyUs';
 import Examples from '@/components/sections/Examples';
@@ -15,6 +16,7 @@ export default function Home() {
     <div className="relative">
       <Nav />
       <Hero />
+      <CustomerLogos />
       <Approach />
       <WhyUs />
       <Examples />

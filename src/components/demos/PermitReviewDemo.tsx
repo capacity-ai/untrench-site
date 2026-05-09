@@ -218,6 +218,14 @@ export default function PermitReviewDemo() {
     }
   }, [letterVisible]);
 
+  // Scroll findings panel to bottom after success state renders
+  useEffect(() => {
+    if (emailSent && findingsPanelRef.current) {
+      const panel = findingsPanelRef.current;
+      setTimeout(() => { panel.scrollTop = panel.scrollHeight; }, 80);
+    }
+  }, [emailSent]);
+
   function runScenario(key: ScenarioKey) {
     const scenario = SCENARIOS[key];
     clearTimers();
@@ -551,12 +559,12 @@ export default function PermitReviewDemo() {
                             Email queued for the applicant. {scenario.reviewer.split(' (')[0]} has been notified.
                           </p>
                           <div className="flex items-center justify-center gap-3 flex-wrap">
-                            <button onClick={handleReset} className="btn-primary px-6 py-3 text-sm">
-                              Try another scenario <span className="caret">&rarr;</span>
-                            </button>
-                            <Link href="/#contact" className="btn-ghost px-6 py-3 text-sm">
+                            <Link href="/#contact" className="btn-primary px-6 py-3 text-sm">
                               Talk to us <span className="caret">&rarr;</span>
                             </Link>
+                            <button onClick={handleReset} className="btn-ghost px-6 py-3 text-sm">
+                              Try another scenario
+                            </button>
                           </div>
                         </div>
                       </>

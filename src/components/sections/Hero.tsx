@@ -21,8 +21,7 @@ export default function Hero() {
             </div>
             <h1 className="reveal d2 display text-[8vw] md:text-[6vw] lg:text-[88px] xl:text-[100px] font-semibold">
               Most local government<br />
-              AI projects<br />
-              <span className="display-italic-heavy">don&rsquo;t work.</span>
+              AI projects <span className="display-italic-heavy">don&rsquo;t work.</span>
             </h1>
             <h2 className="reveal d3 display text-[6vw] md:text-[4.5vw] lg:text-[56px] xl:text-[64px] mt-6 lg:mt-10 max-w-[18ch] font-medium">
               Ours do, because we do<br />the <span className="accent-mark">unglamorous parts</span>.

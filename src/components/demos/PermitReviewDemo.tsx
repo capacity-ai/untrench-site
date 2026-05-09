@@ -361,7 +361,7 @@ export default function PermitReviewDemo() {
         {isActive && scenario && (
           <div
             className="grid"
-            style={{ gridTemplateColumns: '300px 1fr 380px' }}
+            style={{ gridTemplateColumns: '300px 300px 1fr' }}
           >
             {/* ── Left: Agent chat ─────────────────────────────────────── */}
             <aside

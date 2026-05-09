@@ -11,23 +11,18 @@ const LOGOS = [
   { src: 'https://info.polco.us/hs-fs/hubfs/Logos/Clients/American_Canyon_logo.webp', alt: 'City of American Canyon' },
 ];
 
-// Duplicate for seamless loop
-const TRACK = [...LOGOS, ...LOGOS];
-
 export default function CustomerLogos() {
   return (
-    <section className="relative z-10 border-b hairline bg-[color:var(--paper)] overflow-hidden py-10">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-10 mb-7">
-        <p className="mono text-[11px] uppercase tracking-[0.2em] opacity-50 text-center">
+    <section className="relative z-10 border-b hairline bg-[color:var(--paper)] py-10">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
+        <p className="mono text-[11px] uppercase tracking-[0.2em] opacity-50 text-center mb-8">
           Trusted by 1,000+ communities &middot; 50 states &middot; 30+ years
         </p>
-      </div>
-      <div className="logo-track-wrap">
-        <div className="logo-track">
-          {TRACK.map((logo, i) => (
+        <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
+          {LOGOS.map((logo) => (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              key={i}
+              key={logo.alt}
               src={logo.src}
               alt={logo.alt}
               className="logo-item"

@@ -90,15 +90,6 @@ body::before {
 }
 
 /* Customer logo banner */
-.logo-track-wrap { overflow: hidden; }
-.logo-track {
-  display: flex;
-  align-items: center;
-  gap: 4rem;
-  width: max-content;
-  animation: marquee 40s linear infinite;
-  padding: 0 2rem;
-}
 .logo-item {
   height: 36px;
   width: auto;

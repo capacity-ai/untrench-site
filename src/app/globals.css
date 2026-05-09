@@ -39,6 +39,13 @@ body {
   font-style: italic;
   font-variation-settings: 'opsz' 144;
 }
+/* Inline italic for body text — uses body-size optical axis, not display size */
+.body-italic {
+  font-family: var(--font-fraunces), serif;
+  font-style: italic;
+  font-variation-settings: 'opsz' 14;
+  font-size: inherit;
+}
 .display-italic-heavy {
   font-family: var(--font-fraunces), serif;
   font-style: italic;
@@ -81,6 +88,28 @@ body::before {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
+
+/* Customer logo banner */
+.logo-track-wrap { overflow: hidden; }
+.logo-track {
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+  padding: 0 2rem;
+}
+.logo-item {
+  height: 36px;
+  width: auto;
+  max-width: 120px;
+  object-fit: contain;
+  filter: grayscale(1) brightness(0.08);
+  opacity: 0.55;
+  flex-shrink: 0;
+  transition: opacity 0.2s ease;
+}
+.logo-item:hover { opacity: 0.85; }
 
 /* Reveal on load */
 .reveal { opacity: 0; transform: translateY(10px); animation: reveal 1s cubic-bezier(0.2, 0.6, 0.2, 1) forwards; }

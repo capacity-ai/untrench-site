@@ -46,7 +46,7 @@ export default function Examples() {
               </p>
               <div className="mt-6 flex items-center gap-2 text-sm font-medium">
                 <span>Try the demo</span>
-                <span className="arrow inline-block">&UpperRightArrow;</span>
+                <span className="arrow inline-block">↗</span>
               </div>
             </div>
             <div className="col-span-12 lg:col-span-6">
@@ -91,7 +91,7 @@ export default function Examples() {
                 Reads your city&rsquo;s capital plan and prior awards. Surfaces federal, state, and foundation grants you actually qualify for, with fit reasoning, then drafts the narrative in your voice, not in AI voice.
               </p>
               <div className="mt-6 flex items-center gap-2 text-sm font-medium opacity-70">
-                <span>Coming soon</span>
+                <span>Demo available soon</span>
               </div>
             </div>
             <div className="col-span-12 lg:col-span-6">
@@ -143,7 +143,7 @@ export default function Examples() {
                 and drafts response sections weaving in your past wins.
               </p>
               <div className="mt-6 flex items-center gap-2 text-sm font-medium opacity-70">
-                <span>Coming soon</span>
+                <span>Demo available soon</span>
               </div>
             </div>
             <div className="col-span-12 lg:col-span-6">
@@ -195,7 +195,7 @@ export default function Examples() {
                 Every decision logged, every draft reviewable.
               </p>
               <div className="mt-6 flex items-center gap-2 text-sm font-medium opacity-70">
-                <span>Coming soon</span>
+                <span>Demo available soon</span>
               </div>
             </div>
             <div className="col-span-12 lg:col-span-6">
@@ -250,7 +250,7 @@ export default function Examples() {
                 Every flag has a citation chain to the source ordinance.
               </p>
               <div className="mt-6 flex items-center gap-2 text-sm font-medium opacity-70">
-                <span>Coming soon</span>
+                <span>Demo available soon</span>
               </div>
             </div>
             <div className="col-span-12 lg:col-span-6">

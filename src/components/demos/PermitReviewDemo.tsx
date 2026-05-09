@@ -51,7 +51,7 @@ function AppWindow({
         {/* Title */}
         <div className="flex-1 text-center">
           <span className="text-[12px] font-medium opacity-50">
-            Untrench &middot; Permit Review
+            National AI Lab &middot; Permit Review
             {permitId && (
               <span className="opacity-70"> &mdash; {permitId}</span>
             )}
@@ -190,7 +190,9 @@ export default function PermitReviewDemo() {
   const [emailSent, setEmailSent] = useState(false);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const startTimeRef = useRef<number>(0);
-  const reasoningRef = useRef<HTMLDivElement>(null);
+  const chatPanelRef = useRef<HTMLDivElement>(null);
+  const findingsPanelRef = useRef<HTMLDivElement>(null);
+  const letterRef = useRef<HTMLDivElement>(null);
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach(clearTimeout);
@@ -199,13 +201,22 @@ export default function PermitReviewDemo() {
 
   useEffect(() => () => clearTimers(), [clearTimers]);
 
+  // Auto-scroll chat panel when new messages arrive
   useEffect(() => {
-    if (reasoningRef.current) {
-      reasoningRef.current.scrollTop = reasoningRef.current.scrollHeight;
+    if (chatPanelRef.current) {
+      chatPanelRef.current.scrollTop = chatPanelRef.current.scrollHeight;
     }
-  }, [steps]);
+  }, [chatMsgs, steps]);
 
-  // Letter appears naturally as page grows — no forced scroll
+  // Scroll findings panel to letter when it becomes ready
+  useEffect(() => {
+    if (letterVisible && findingsPanelRef.current && letterRef.current) {
+      const panel = findingsPanelRef.current;
+      const letter = letterRef.current;
+      const offset = letter.getBoundingClientRect().top - panel.getBoundingClientRect().top;
+      panel.scrollBy({ top: offset - 24, behavior: 'smooth' });
+    }
+  }, [letterVisible]);
 
   function runScenario(key: ScenarioKey) {
     const scenario = SCENARIOS[key];
@@ -350,12 +361,122 @@ export default function PermitReviewDemo() {
         {isActive && scenario && (
           <div
             className="grid"
-            style={{ gridTemplateColumns: '280px 1fr 300px' }}
+            style={{ gridTemplateColumns: '300px 1fr 380px' }}
           >
-            {/* Left: Submittal form — grows with content, page scrolls */}
+            {/* ── Left: Agent chat ─────────────────────────────────────── */}
             <aside
-              className="border-r hairline"
-              style={{ background: 'var(--paper)' }}
+              className="border-r hairline flex flex-col"
+              style={{ background: 'var(--paper-deep)', height: 'calc(100vh - 10rem)', minHeight: '520px' }}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 py-2.5 border-b hairline flex-shrink-0">
+                <div className="label opacity-60" style={{ fontSize: '10px' }}>Agent</div>
+                <div className="flex items-center gap-2">
+                  {isWorking && (
+                    <span className="status-pill" style={{ fontSize: '9px' }}>
+                      <span className="live-dot" /> Working
+                    </span>
+                  )}
+                  <span className="mono text-[9px] opacity-40">{scenario.reviewer.split(' (')[0]}</span>
+                </div>
+              </div>
+
+              {/* Messages */}
+              <div ref={chatPanelRef} className="flex-1 overflow-y-auto scroll-area px-3 py-3 space-y-2">
+                {/* PDF upload — user bubble */}
+                <div className="flex justify-end mb-1">
+                  <div
+                    className="rounded-lg px-3 py-2 text-[11px] leading-snug max-w-[88%]"
+                    style={{ background: 'var(--polco-deep)', color: '#fff' }}
+                  >
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      {/* PDF icon */}
+                      <svg width="12" height="14" viewBox="0 0 12 14" fill="none" style={{ flexShrink: 0 }}>
+                        <rect x="0.5" y="0.5" width="11" height="13" rx="1.5" stroke="rgba(255,255,255,0.6)" strokeWidth="1"/>
+                        <path d="M3 5h6M3 7h6M3 9h4" stroke="rgba(255,255,255,0.7)" strokeWidth="1" strokeLinecap="round"/>
+                      </svg>
+                      <span className="font-medium truncate">{scenario.docTitle.replace(/&middot;.*/, '').trim()}.pdf</span>
+                    </div>
+                    <div className="opacity-60 text-[9px] mono mt-0.5">Uploaded for review</div>
+                  </div>
+                </div>
+
+                {/* AI messages */}
+                {chatMsgs.length === 0 && steps.length === 0 && (
+                  <div className="text-[11px] opacity-25 italic py-6 text-center leading-relaxed">
+                    Agent narration will<br />appear here as it works.
+                  </div>
+                )}
+
+                {chatMsgs.map((msg, i) => (
+                  <div key={i} className="flex gap-2 items-start">
+                    <div
+                      className="flex-shrink-0 w-[18px] h-[18px] rounded flex items-center justify-center text-[7px] font-bold mt-0.5 leading-none"
+                      style={{ background: 'var(--accent)', color: '#fff', letterSpacing: '0.04em' }}
+                    >
+                      AI
+                    </div>
+                    <div
+                      className="text-[11.5px] leading-snug rounded px-2.5 py-1.5 flex-1"
+                      style={{ background: 'var(--paper)', border: '1px solid var(--rule)' }}
+                    >
+                      {msg.text}
+                    </div>
+                  </div>
+                ))}
+
+                {/* Reasoning steps — compact inline */}
+                {steps.length > 0 && (
+                  <div className="mt-2 pt-2 border-t hairline space-y-1.5">
+                    <div className="mono text-[9px] opacity-30 uppercase tracking-wider">Internal reasoning</div>
+                    {steps.map((step, i) => (
+                      <div key={i} className="step flex gap-2 text-[10px] leading-snug">
+                        <div className={`step-icon ${step.status}`} style={{ width: 12, height: 12, marginTop: 2, flexShrink: 0 }} />
+                        <div className="flex-1 min-w-0 opacity-60">
+                          <span dangerouslySetInnerHTML={{ __html: step.text }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Typing indicator */}
+                {isWorking && (
+                  <div className="flex gap-2 items-start">
+                    <div
+                      className="flex-shrink-0 w-[18px] h-[18px] rounded flex items-center justify-center text-[7px] font-bold"
+                      style={{ background: 'var(--accent)', color: '#fff' }}
+                    >
+                      AI
+                    </div>
+                    <div
+                      className="text-[13px] rounded px-2.5 py-1"
+                      style={{ background: 'var(--paper)', border: '1px solid var(--rule)', letterSpacing: '0.1em' }}
+                    >
+                      <span className="opacity-30 animate-pulse">· · ·</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Disabled input */}
+              <div className="border-t hairline px-3 py-2.5 flex-shrink-0 flex gap-1.5 items-center">
+                <input
+                  type="text"
+                  disabled
+                  placeholder={isWorking ? 'Review in progress…' : 'Demo mode — input disabled'}
+                  className="flex-1 text-[10.5px] px-2 py-1.5 border hairline rounded opacity-30 cursor-not-allowed bg-transparent"
+                />
+                <button disabled className="text-[10.5px] px-2 py-1.5 border hairline rounded opacity-20 cursor-not-allowed whitespace-nowrap">
+                  Send
+                </button>
+              </div>
+            </aside>
+
+            {/* ── Middle: Submittal ─────────────────────────────────────── */}
+            <div
+              className="border-r hairline overflow-y-auto scroll-area"
+              style={{ background: 'var(--paper)', height: 'calc(100vh - 10rem)', minHeight: '520px' }}
             >
               <div className="p-4">
                 <div className="flex items-center justify-between mb-3">
@@ -369,12 +490,13 @@ export default function PermitReviewDemo() {
                   dangerouslySetInnerHTML={{ __html: scenario.docContent }}
                 />
               </div>
-            </aside>
+            </div>
 
-            {/* Center: Findings + letter — grows with content, page scrolls */}
-            <div
-              className="border-r hairline"
-              style={{ background: 'var(--paper)' }}
+            {/* ── Right: Findings + letter ─────────────────────────────── */}
+            <aside
+              ref={findingsPanelRef}
+              className="overflow-y-auto scroll-area"
+              style={{ background: 'var(--paper)', height: 'calc(100vh - 10rem)', minHeight: '520px' }}
             >
               <div className="p-5">
                 {/* Findings header */}
@@ -387,7 +509,7 @@ export default function PermitReviewDemo() {
                   </div>
                 </div>
 
-                <div className="space-y-3 min-h-[200px]">
+                <div className="space-y-3 min-h-[160px]">
                   {issues.length === 0 && (
                     <div className="text-sm opacity-40 italic py-12 text-center">
                       Findings will appear here as the agent works.
@@ -400,7 +522,7 @@ export default function PermitReviewDemo() {
 
                 {/* Reviewer letter */}
                 {letterVisible && (
-                  <div className="mt-8">
+                  <div ref={letterRef} className="mt-8">
                     <div className="flex items-center justify-between mb-3">
                       <div className="label opacity-60">Draft &middot; reviewer&rsquo;s letter</div>
                       <span className="status-pill" style={{ borderColor: 'var(--green)', color: 'var(--green)' }}>
@@ -453,97 +575,6 @@ export default function PermitReviewDemo() {
                     )}
                   </div>
                 )}
-              </div>
-            </div>
-
-            {/* Right: Chat + Reasoning — natural flow, each panel has its own bounded scroll */}
-            <aside style={{ background: 'var(--paper-deep)' }}>
-              {/* Chat panel */}
-              <div className="p-4 border-b hairline">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="label opacity-60" style={{ fontSize: '10px' }}>Agent</div>
-                  <span className="mono text-[9px] opacity-40">{scenario.reviewer.split(' (')[0]}</span>
-                </div>
-                <div className="max-h-72 overflow-y-auto scroll-area space-y-2 pr-0.5">
-                  {chatMsgs.length === 0 ? (
-                    <div className="text-[11px] opacity-30 italic py-8 text-center leading-relaxed">
-                      Agent will narrate<br />findings as it works.
-                    </div>
-                  ) : (
-                    chatMsgs.map((msg, i) => (
-                      <div key={i} className="flex gap-2 items-start">
-                        <div
-                          className="flex-shrink-0 w-[18px] h-[18px] rounded flex items-center justify-center text-[7px] font-bold mt-0.5 leading-none"
-                          style={{ background: 'var(--accent)', color: 'var(--paper)', letterSpacing: '0.04em' }}
-                        >
-                          AI
-                        </div>
-                        <div
-                          className="text-[11.5px] leading-snug rounded px-2 py-1.5 flex-1"
-                          style={{ background: 'var(--paper)', border: '1px solid var(--rule)' }}
-                        >
-                          {msg.text}
-                        </div>
-                      </div>
-                    ))
-                  )}
-                  {isWorking && (
-                    <div className="flex gap-2 items-start">
-                      <div
-                        className="flex-shrink-0 w-[18px] h-[18px] rounded flex items-center justify-center text-[7px] font-bold"
-                        style={{ background: 'var(--accent)', color: 'var(--paper)' }}
-                      >
-                        AI
-                      </div>
-                      <div
-                        className="text-[13px] rounded px-2.5 py-1"
-                        style={{ background: 'var(--paper)', border: '1px solid var(--rule)', letterSpacing: '0.1em' }}
-                      >
-                        <span className="opacity-30 animate-pulse">· · ·</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                {/* Disabled input */}
-                <div className="mt-2 pt-2 border-t hairline flex gap-1.5 items-center">
-                  <input
-                    type="text"
-                    disabled
-                    placeholder={isWorking ? 'Review in progress…' : 'Demo mode — input disabled'}
-                    className="flex-1 text-[10.5px] px-2 py-1 border hairline rounded opacity-30 cursor-not-allowed bg-transparent"
-                  />
-                  <button disabled className="text-[10.5px] px-2 py-1 border hairline rounded opacity-20 cursor-not-allowed whitespace-nowrap">
-                    Send
-                  </button>
-                </div>
-              </div>
-
-              {/* Reasoning trail */}
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="label opacity-40" style={{ fontSize: '9px' }}>Internal reasoning</div>
-                  {phase === 'complete' ? (
-                    <span className="mono text-[9px]" style={{ color: 'var(--green)' }}>done</span>
-                  ) : (
-                    <span className="mono text-[9px] opacity-40">live</span>
-                  )}
-                </div>
-                <div ref={reasoningRef} className="max-h-56 overflow-y-auto scroll-area space-y-2">
-                  {steps.length === 0 && (
-                    <div className="text-[10px] opacity-25 italic py-4 text-center">
-                      Steps will appear here.
-                    </div>
-                  )}
-                  {steps.map((step, i) => (
-                    <div key={i} className="step flex gap-2 text-[11px] leading-snug">
-                      <div className={`step-icon ${step.status}`} style={{ width: 14, height: 14, marginTop: 2 }} />
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-[10.5px]" dangerouslySetInnerHTML={{ __html: step.text }} />
-                        <div className="opacity-50 text-[9.5px] mt-0.5 leading-snug mono" dangerouslySetInnerHTML={{ __html: step.detail }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
               </div>
             </aside>
           </div>

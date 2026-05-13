@@ -188,6 +188,7 @@ export default function PermitReviewDemo() {
   const [letterVisible, setLetterVisible] = useState(false);
   const [readPct, setReadPct] = useState(0);
   const [emailSent, setEmailSent] = useState(false);
+  const [mobileTab, setMobileTab] = useState<'agent' | 'submittal' | 'findings'>('agent');
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const startTimeRef = useRef<number>(0);
   const chatPanelRef = useRef<HTMLDivElement>(null);
@@ -216,6 +217,11 @@ export default function PermitReviewDemo() {
       const offset = letter.getBoundingClientRect().top - panel.getBoundingClientRect().top;
       panel.scrollBy({ top: offset - 24, behavior: 'smooth' });
     }
+  }, [letterVisible]);
+
+  // Auto-advance mobile tab to findings when letter is ready
+  useEffect(() => {
+    if (letterVisible) setMobileTab('findings');
   }, [letterVisible]);
 
   // Scroll findings panel to bottom after success state renders
@@ -367,14 +373,27 @@ export default function PermitReviewDemo() {
 
         {/* ── Workspace ── */}
         {isActive && scenario && (
+          <>
+          {/* Mobile tab bar */}
+          <div className="md:hidden flex border-b hairline text-[11px]" style={{ background: 'var(--paper-deep)' }}>
+            {(['agent', 'submittal', 'findings'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setMobileTab(tab)}
+                className={`flex-1 py-2.5 mono capitalize transition-opacity ${mobileTab === tab ? 'opacity-100 border-b-2 border-[color:var(--accent)]' : 'opacity-40'}`}
+              >
+                {tab === 'findings' && issues.length > 0 ? `Findings (${issues.length})` : tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
+          </div>
           <div
-            className="grid"
+            className="flex flex-col md:grid"
             style={{ gridTemplateColumns: '300px 300px 1fr' }}
           >
             {/* ── Left: Agent chat ─────────────────────────────────────── */}
             <aside
-              className="border-r hairline flex flex-col"
-              style={{ background: 'var(--paper-deep)', height: 'calc(100vh - 10rem)', minHeight: '520px' }}
+              className={`border-r hairline flex flex-col ${mobileTab !== 'agent' ? 'hidden md:flex' : ''}`}
+              style={{ background: 'var(--paper-deep)', height: 'calc(100vh - 12rem)', minHeight: '480px' }}
             >
               {/* Header */}
               <div className="flex items-center justify-between px-4 py-2.5 border-b hairline flex-shrink-0">
@@ -483,8 +502,8 @@ export default function PermitReviewDemo() {
 
             {/* ── Middle: Submittal ─────────────────────────────────────── */}
             <div
-              className="border-r hairline overflow-y-auto scroll-area"
-              style={{ background: 'var(--paper)', height: 'calc(100vh - 10rem)', minHeight: '520px' }}
+              className={`border-r hairline overflow-y-auto scroll-area ${mobileTab !== 'submittal' ? 'hidden md:block' : ''}`}
+              style={{ background: 'var(--paper)', height: 'calc(100vh - 12rem)', minHeight: '480px' }}
             >
               <div className="p-4">
                 <div className="flex items-center justify-between mb-3">
@@ -503,8 +522,8 @@ export default function PermitReviewDemo() {
             {/* ── Right: Findings + letter ─────────────────────────────── */}
             <aside
               ref={findingsPanelRef}
-              className="overflow-y-auto scroll-area"
-              style={{ background: 'var(--paper)', height: 'calc(100vh - 10rem)', minHeight: '520px' }}
+              className={`overflow-y-auto scroll-area ${mobileTab !== 'findings' ? 'hidden md:block' : ''}`}
+              style={{ background: 'var(--paper)', height: 'calc(100vh - 12rem)', minHeight: '480px' }}
             >
               <div className="p-5">
                 {/* Findings header */}
@@ -586,6 +605,7 @@ export default function PermitReviewDemo() {
               </div>
             </aside>
           </div>
+          </>
         )}
 
       </AppWindow>

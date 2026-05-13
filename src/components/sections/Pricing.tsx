@@ -13,7 +13,8 @@ export default function Pricing() {
             </h3>
             <p className="mt-6 max-w-[60ch] text-lg leading-snug opacity-80">
               We don&rsquo;t do &ldquo;contact us for pricing.&rdquo; You&rsquo;re running a city. You don&rsquo;t have time
-              for a five-week sales cycle to find out if we&rsquo;re in your budget. Here&rsquo;s how it works:
+              for a five-week sales cycle to find out if we&rsquo;re in your budget. We have a lot of flexible options
+              depending on what you need — here&rsquo;s the structure:
             </p>
           </div>
         </div>
@@ -34,8 +35,8 @@ export default function Pricing() {
                 Data integrations included.
               </p>
               <div className="mb-6">
-                <div className="display text-5xl lg:text-6xl font-medium num">One fee</div>
-                <div className="mono text-xs opacity-60 mt-2">Quoted in writing after a 30-min scoping call. No surprises.</div>
+                <div className="display text-5xl lg:text-6xl font-medium num">$5K–$500K</div>
+                <div className="mono text-xs opacity-60 mt-2">Range depends on scope — a single-department pilot looks very different from a city-wide rollout. Quoted in writing after a 30-min scoping call.</div>
               </div>
               <ul className="space-y-2.5 text-sm leading-snug border-t hairline pt-5 mt-auto">
                 <li className="flex gap-2">

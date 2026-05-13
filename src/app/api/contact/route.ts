@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
 
 interface ContactPayload {
   name: string;
@@ -80,31 +79,6 @@ export async function POST(req: NextRequest) {
     }
   } else {
     console.log('[contact] SLACK_WEBHOOK_URL not set. Submission:\n', message);
-  }
-
-  // Send email via Resend
-  const resendApiKey = process.env.RESEND_API_KEY;
-  console.log('[contact] RESEND_API_KEY present:', !!resendApiKey);
-  if (resendApiKey) {
-    try {
-      const resend = new Resend(resendApiKey);
-      const { data, error } = await resend.emails.send({
-        from: 'Untrench Contact <contact@untrench.work>',
-        to: ['alex.aitest@polco.us', 'alex@polco.us'],
-        subject: `New contact form submission from ${body.name}`,
-        text: message,
-      });
-      if (error) {
-        console.error('Resend email error:', JSON.stringify(error));
-      } else {
-        console.log('Resend email sent, id:', data?.id);
-      }
-    } catch (err) {
-      console.error('Resend email error (thrown):', err);
-      // Graceful fallback — don't 500 the user
-    }
-  } else {
-    console.log('[contact] RESEND_API_KEY not set. Would have emailed submission to alex.aitest@polco.us');
   }
 
   return NextResponse.json({ success: true }, { status: 200 });

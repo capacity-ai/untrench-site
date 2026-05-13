@@ -23,7 +23,7 @@ export default function WhyUs() {
               That&rsquo;s our day job, and we&rsquo;re good at it.
             </p>
             <p>
-              We didn&rsquo;t set out to build agentic AI products. We started <span className="display-italic">Untrench</span>{' '}
+              We didn&rsquo;t set out to build agentic AI products. We started <span className="display-italic">National AI Lab</span>{' '}
               because we kept watching the same thing happen: vendors selling local governments expensive, brittle
               &ldquo;AI solutions&rdquo; that hallucinate code citations, ignore the actual jurisdiction,
               and produce work nobody on staff would sign their name to.
